@@ -11,15 +11,13 @@
         {% block title %}
         Главная
         {% endblock %}
-        | notesapp
+        | mondiv
     </title>
 </head>
 <body>
 
-
+{% include 'mondiv/parts/navbar.html' %}
 {% bootstrap_messages %}
-<button type="button" class="btn btn-primary">Primary</button>
-<button type="button" class="btn btn-primary">Primary</button>
 {% block content %}
 {% endblock %}
 

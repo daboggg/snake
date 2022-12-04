@@ -1,6 +1,8 @@
 env
 .idea
+.env.dev
 .env.prod.db
 .env.prod
 /app/mondiv/migrations/
 /app/mediafiles
+Makefile

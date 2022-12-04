@@ -1,0 +1,59 @@
+{% extends 'mondiv/layout/basic.html' %}
+{% load bootstrap5 %}
+{% load my_tags_and_filters %}
+{% block title %}
+    Добавить компанию
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mt-5">
+            <div class=" offset-4 col-4 mt-5">
+                <form method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-secondary">
+                            Добавить
+                        </button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-10">
+                {% companies as companies %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Иконка</th>
+                        <th scope="col">Логотип</th>
+                        <th scope="col">Тикер</th>
+                        <th scope="col">Название</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for c in companies %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>
+                                {% if c.icon_image %}
+                                <img style="width: 40px" src="{{ c.icon_image.url }}" class="img-thumbnail" alt="">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if c.logo_image %}
+                                <img style="width: 40px" src="{{ c.logo_image.url }}" class="img-thumbnail" alt="">
+                                {% endif %}
+                            </td>
+                            <td>{{ c.ticker }}</td>
+                            <td>{{ c.name }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
