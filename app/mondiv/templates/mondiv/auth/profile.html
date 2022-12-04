@@ -1,0 +1,16 @@
+{% extends 'mondiv/layout/basic.html' %}
+{% load bootstrap5 %}
+
+{% block title %}
+Профиль пользователя
+{% endblock %}
+
+{% block content %}
+    <h2>Профиль пользователя {{ user.username }}</h2>
+    {% if user.first_name %}
+        <p>Здравствуйте, {{ user.first_name }}!</p>
+    {% else %}
+        <p>Здравствуйте!</p>
+    {% endif %}
+    <h3>Что то еще</h3>
+{% endblock %}

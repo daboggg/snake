@@ -28,7 +28,6 @@
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Иконка</th>
-                        <th scope="col">Логотип</th>
                         <th scope="col">Тикер</th>
                         <th scope="col">Название</th>
                     </tr>
@@ -40,11 +39,6 @@
                             <td>
                                 {% if c.icon_image %}
                                 <img style="width: 40px" src="{{ c.icon_image.url }}" class="img-thumbnail" alt="">
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if c.logo_image %}
-                                <img style="width: 40px" src="{{ c.logo_image.url }}" class="img-thumbnail" alt="">
                                 {% endif %}
                             </td>
                             <td>{{ c.ticker }}</td>
