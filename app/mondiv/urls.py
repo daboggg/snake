@@ -12,7 +12,11 @@ urlpatterns = [
     path('accounts/profile/change/', ChangeUserInfoView.as_view(), name='profile_change'),
     path('accounts/profile/', profile, name='profile'),
     path('accounts/login/', MDLoginView.as_view(), name='login'),
+    path('proba/', proba, name='proba'),
+    path('last_year/', last_year, name='last_year'),
+    path('last_three_years/', last_three_years, name='last_three_years'),
     path('add_company/', add_company, name='add_company'),
-    path('add_dividend/', add_dividend, name='add_dividend'),
+    path('add_dividend/', AddDividendView.as_view(), name='add_dividend'),
+    path('dividends_received/', DividendsReceivedView.as_view(), name='dividends_received'),
     path('', index, name='index'),
 ]

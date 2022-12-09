@@ -6,5 +6,20 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Добавить дивиденд</h1>
+    <div class="container">
+        <div class="row mt-5">
+            <div class=" offset-4 col-4 mt-5">
+                {{ form.media }}
+                <form method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-secondary">
+                            Добавить
+                        </button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -1,8 +1,7 @@
 {% extends 'mondiv/layout/basic.html' %}
 {% load bootstrap5 %}
-
 {% block title %}
-Профиль пользователя
+    Профиль пользователя
 {% endblock %}
 
 {% block content %}
@@ -12,5 +11,105 @@
     {% else %}
         <p>Здравствуйте!</p>
     {% endif %}
-    <h3>Что то еще</h3>
+
+
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-6">
+
+                <canvas id="myChart1" width="500" height="400"></canvas>
+
+                <script type="text/javascript">
+                    $.get({% url 'mondiv:last_year' %}, function (data) {
+                        var ctx = $("#myChart1").get(0).getContext("2d");
+                        new Chart(ctx, data);
+                    });
+                </script>
+
+
+            </div>
+            <div class="col-6">
+
+                <canvas id="myChart2" width="500" height="400"></canvas>
+
+                <script type="text/javascript">
+                    $.get({% url 'mondiv:last_year' %}+'?currency=RUB', function (data) {
+                        var ctx = $("#myChart2").get(0).getContext("2d");
+                        new Chart(ctx, data);
+                    });
+                </script>
+
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+
+                <canvas id="myChart3" width="500" height="400"></canvas>
+
+                <script type="text/javascript">
+                    $.get({% url 'mondiv:last_three_years' %}, function (data) {
+                        var ctx = $("#myChart3").get(0).getContext("2d");
+                        new Chart(ctx, data);
+                    });
+                </script>
+
+
+            </div>
+            <div class="col-6">
+
+                <canvas id="myChart4" width="500" height="400"></canvas>
+
+                <script type="text/javascript">
+                    $.get(({% url 'mondiv:last_three_years' %} + '?currency=RUB'), function (data) {
+                        var ctx = $("#myChart4").get(0).getContext("2d");
+                        new Chart(ctx, data);
+                    });
+                </script>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
 {% endblock %}
+
+
+
+
+{#                <canvas id="myChart" width="500" height="400"></canvas>#}
+{##}
+{#                <script>#}
+{#                    const ctx = document.getElementById('myChart');#}
+{##}
+{#                    new Chart(ctx, {#}
+{#                        type: 'bar',#}
+{#                        data: {#}
+{#                            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange', 'dsds'],#}
+{#                            datasets: [{#}
+{#                                label: '# of Votes',#}
+{#                                data: [12, 19, 3, 5, 2, 3, 0],#}
+{#data: [{x: 'Sales', y: 20},{x: 'Revenue', y: 10}],#}
+{#                                borderWidth: 1,#}
+{#                                borderColor: 'rgb(255, 99, 132)',#}
+{#                                backgroundColor: ['' +#}
+{#                                'rgba(86,114,255,0.8)',#}
+{#                                    'rgb(242,242,242)'#}
+{#                                ],#}
+{#                                borderRadius:6,#}
+{#                                categoryPercentage: 0.8,#}
+{#                                hoverBackgroundColor: 'rgb(242,242,242)',#}
+{#                            }]#}
+{#                        },#}
+{#                        options: {#}
+{#                            scales: {#}
+{#                                y: {#}
+{#                                    beginAtZero: true#}
+{#                                }#}
+{#                            }#}
+{#                        }#}
+{#                    });#}
+{#                </script>#}

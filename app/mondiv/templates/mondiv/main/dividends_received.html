@@ -1,29 +1,14 @@
 {% extends 'mondiv/layout/basic.html' %}
 {% load bootstrap5 %}
-{% load bootstrap_icons %}
 {% load my_tags_and_filters %}
 {% block title %}
-    Добавить компанию
+Полученные дивиденды
 {% endblock %}
 
 {% block content %}
     <div class="container">
         <div class="row mt-5">
-            <div class=" offset-4 col-4 mt-5">
-                <form method="post">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    {% buttons %}
-                        <button type="submit" class="btn btn-secondary">
-                            Добавить
-                        </button>
-                    {% endbuttons %}
-                </form>
-            </div>
-        </div>
-        <div class="row mt-5">
             <div class="col-10">
-                {% companies as companies %}
                 <table class="table align-middle">
                     <thead>
                     <tr>
@@ -31,20 +16,23 @@
                         <th scope="col">Иконка</th>
                         <th scope="col">Тикер</th>
                         <th scope="col">Название</th>
-{#                        <th scope="col">Удалить</th>#}
+                        <th scope="col">Сумма</th>
+                        <th scope="col">Дата</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for c in companies %}
+                    {% for d in dividends %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             <td>
-                                {% if c.icon_image %}
-                                <img style="width: 40px" src="{{ c.icon_image.url }}" class="img-thumbnail" alt="">
+                                {% if d.company.icon_image %}
+                                <img style="width: 40px" src="{{ d.company.icon_image.url }}" class="img-thumbnail" alt="">
                                 {% endif %}
                             </td>
-                            <td>{{ c.ticker }}</td>
-                            <td>{{ c.name }}</td>
+                            <td>{{ d.company.ticker }}</td>
+                            <td>{{ d.company.name }}</td>
+                            <td>{{ d.total }}</td>
+                            <td>{{ d.date_of_receipt }}</td>
 {#                            <td>#}
 {#                                <a href="">{% bs_icon 'x-lg' size='1.3em' color='red' %}</a>#}
 {#                            </td>#}

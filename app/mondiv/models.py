@@ -1,10 +1,24 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 from django.db import models
 from django.core.files import File
 from urllib import request
 import os
 
 from mondiv.utils import get_upl_and_apiKey
+
+class Currency(models.Model):
+    name = models.CharField(max_length=5, verbose_name='Валюта')
+
+    def __str__(self):
+        return self.name
+
+class Account(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Брокерский счет')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Владелец счета')
+
+    def __str__(self):
+        return self.name
+
 
 
 class Company(models.Model):
@@ -14,6 +28,14 @@ class Company(models.Model):
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     icon_image = models.ImageField(upload_to='images/icon', verbose_name='Иконка', null=True)
     icon_url = models.URLField(null=True)
+
+    # def delete(self, *args, **kwargs):
+    #     # До удаления записи получаем необходимую информацию
+    #     storage, path = self.icon_image.storage, self.icon_image.path
+    #     # Удаляем сначала модель ( объект )
+    #     super().delete(*args, **kwargs)
+    #     # Потом удаляем сам файл
+    #     storage.delete(path)
 
     def get_remote_image(self):
         if self.icon_url and not self.icon_image:
@@ -34,10 +56,17 @@ class Company(models.Model):
         verbose_name = 'Компания'
         verbose_name_plural = 'Компании'
 
-# class AppUser(AbstractUser):
-#     is_activated = models.BooleanField(default=True, db_index=True, verbose_name='Прошел активацию?')
-#     send_messages = models.BooleanField(default=True,verbose_name='Слать оповещения о новых комментариях?')
-#
-#     class Meta(AbstractUser.Meta):
-#         pass
 
+class Dividend(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Пользователь')
+    company = models.ForeignKey(Company, on_delete=models.PROTECT, verbose_name='Компания')
+    date_of_receipt = models.DateField(verbose_name='Дата получения выплаты')
+    amount_of_shares = models.SmallIntegerField(verbose_name='Количество акций')
+    quantity_per_share = models.FloatField(verbose_name='Выплата на акцию')
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT, verbose_name='Валюта')
+    account = models.ForeignKey(Account, on_delete=models.PROTECT, verbose_name='Счет')
+
+    class Meta:
+        verbose_name = 'Дивиденд'
+        verbose_name_plural = 'Дивиденды'
+        ordering = ['-date_of_receipt']
