@@ -5,9 +5,6 @@ from mondiv.models import Dividend
 
 
 class AddDividendForm(forms.ModelForm):
-    # date_of_receipt = forms.DateField(widget=DateInput())
-    # date_of_receipt = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'],
-    #                                       widget=forms.DateTimeInput())
     class Meta:
         model=Dividend
         fields = ('company','date_of_receipt','amount_of_shares','quantity_per_share','currency','account')

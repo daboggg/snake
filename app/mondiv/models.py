@@ -55,6 +55,7 @@ class Company(models.Model):
     class Meta:
         verbose_name = 'Компания'
         verbose_name_plural = 'Компании'
+        ordering = ['name']
 
 
 class Dividend(models.Model):
@@ -69,4 +70,4 @@ class Dividend(models.Model):
     class Meta:
         verbose_name = 'Дивиденд'
         verbose_name_plural = 'Дивиденды'
-        ordering = ['-date_of_receipt']
+        # ordering = ['-date_of_receipt']

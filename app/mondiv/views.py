@@ -124,49 +124,21 @@ class RegisterDoneView(TemplateView):
     template_name = 'mondiv/auth/register_done.html'
 
 
-###########  Charts ######################################
-
+###########  Charts json ######################################
 def proba(request):
+    currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
-        .filter(user=request.user, currency__name='RUB', date_of_receipt__gt=f'{datetime.now().year - 2}-01-01') \
+        .filter(user=request.user, currency__name=currency, date_of_receipt__gt=datetime.now() - relativedelta(years=1)) \
         .annotate(month=TruncMonth('date_of_receipt')) \
-        .annotate(year=TruncYear('date_of_receipt')) \
         .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
-        .values('month', 'year') \
+        .values('month') \
         .annotate(total=Sum('payment')) \
         .order_by('month')
 
-    res = [{'month': r['month'].strftime("%B"), 'year': r['year'].year, 'total': r['total']} for r in res]
+    labels = [r['month'].strftime("%B") for r in res]
+    data = [r['total'] for r in res]
 
-    # формирует список по годам
-    list_by_year = []
-    year = datetime.now().year
-    count = 0
-    for y in range(year - 2, year + 1):
-        list_by_year.append([])
-        for r in res:
-            if str(y) == str(r['year']):
-                list_by_year[count].append(r)
-        count = count + 1
-
-    # готовый список
-    ready_list = []
-    cnt = 0
-    for y in list_by_year:
-        # if len(y) == 0:
-        #     print('OOOOOOOOOOOOOOOO')
-        ready_list.append([])
-        for month in get_month_list():
-            flg =True
-            for m in y:
-                if month == m['month']:
-                    ready_list[cnt].append(m['total'])
-                    flg = False
-            if flg:
-                ready_list[cnt].append(0)
-        cnt = cnt + 1
-    print(ready_list)
-    return render(request, 'mondiv/main/proba.html', {'res': ready_list})
+    return render(request, 'mondiv/main/proba.html', {'t': labels, 'd': data})
 
 
 def last_year(request):
@@ -200,15 +172,31 @@ def last_year(request):
                             'size': 18
                         }
                     },
-                }
+                },
+                'tooltip': {
+                    'titleFont': {
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
+                },
+                'title': {
+                    'font': {
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Дивиденды за последний год в {currency}'
+                },
             }
         }
     })
 
-def last_three_years(request):
+def last_n_years(request):
+    year_now = datetime.now().year
+    for_n_years = request.GET.get('for_n_years', 3)
     currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
-        .filter(user=request.user, currency__name=currency, date_of_receipt__gt=f'{datetime.now().year - 2}-01-01') \
+        .filter(user=request.user, date_of_receipt__gt=f'{year_now - (for_n_years - 1)}-01-01', currency__name=currency) \
         .annotate(month=TruncMonth('date_of_receipt')) \
         .annotate(year=TruncYear('date_of_receipt')) \
         .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
@@ -220,9 +208,8 @@ def last_three_years(request):
 
     # формирует список по годам
     list_by_year = []
-    year = datetime.now().year
     count = 0
-    for y in range(year - 2, year + 1):
+    for y in range(year_now - (for_n_years-1), year_now + 1):
         list_by_year.append([])
         for r in res:
             if str(y) == str(r['year']):
@@ -251,16 +238,56 @@ def last_three_years(request):
             'labels': get_month_list(),
             'datasets': [
                 {
-                    'data': ready_list[0],
-                    'label': 'Нет дивидендов' if len(list_by_year[0])==0 else 'Дивиденды за ' + str(list_by_year[0][0]["year"]) + ' год в '+str(currency) ,
+                    'data': ready_list[n],
+                    'label': 'Нет дивидендов' if len(list_by_year[n])==0 else 'Дивиденды за ' + str(list_by_year[n][0]["year"]) + ' год в '+str(currency) ,
+                }
+                for n in range(for_n_years)
+            ]
+        },
+        'options': {
+            'plugins': {
+                'legend': {
+                    'labels': {
+                        'font': {
+                            'size': 18
+                        }
+                    },
                 },
-                {
-                    'data': ready_list[1],
-                    'label': 'Нет дивидендов' if len(list_by_year[1])==0 else 'Дивиденды за ' + str(list_by_year[1][0]["year"]) + ' год в '+str(currency) ,
+                'tooltip': {
+                    'titleFont': {
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
                 },
+                'title': {
+                    'font': {
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Дивиденды за три последних года в {currency}'
+                },
+            }
+        }
+    })
+
+def total_for_each_ticker(request):
+    currency = request.GET.get('currency', 'USD')
+    res = Dividend.objects \
+        .filter(user=request.user, currency__name=currency) \
+        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
+        .values('company__name') \
+        .annotate(total=Sum('payment'))
+
+    return JsonResponse({
+        'type': 'doughnut',
+        'data': {
+            'labels': [r['company__name'] for r in res],
+            'datasets': [
                 {
-                    'data': ready_list[2],
-                    'label': 'Нет дивидендов' if len(list_by_year[2])==0 else 'Дивиденды за ' + str(list_by_year[2][0]["year"]) + ' год в '+str(currency) ,
+                    'data': [r['total'] for r in res],
+                    'label': f'Всего в  {currency}',
+                    'hoverOffset': 8
                 },
             ]
         },
@@ -272,6 +299,20 @@ def last_three_years(request):
                             'size': 18
                         }
                     },
+                },
+                'title': {
+                    'font':{
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Дивиденды в {currency}'
+                },
+                'tooltip': {
+                    'titleFont':{
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
                 }
             }
         }
