@@ -8,10 +8,10 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import F, Count, Sum, DateField
 from django.db.models.functions import TruncMonth, TruncYear
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import UpdateView, CreateView, TemplateView, ListView
+from django.views.generic import UpdateView, CreateView, TemplateView, ListView, DeleteView
 
 from mondiv.forms import SearchCompanyForm, ChangeUserInfoForm, AddDividendForm
 from mondiv.models import Company, Dividend
@@ -32,6 +32,43 @@ class AddDividendView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+class DividendUpdateView(LoginRequiredMixin, UpdateView):
+    model = Dividend
+    form_class = AddDividendForm
+    template_name = 'mondiv/main/dividend_update.html'
+    pk_url_kwarg = 'div_pk'
+    success_url = reverse_lazy('mondiv:dividends_received')
+
+    def get_queryset(self):
+        return Dividend.objects.filter(pk=self.kwargs[self.pk_url_kwarg], user=self.request.user)
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, 'Данные исправлены')
+        return super().form_valid(form)
+
+
+class DividendDeleteView(LoginRequiredMixin, DeleteView):
+    model = Dividend
+    pk_url_kwarg = 'div_pk'
+    success_url = reverse_lazy('mondiv:dividends_received')
+    template_name = 'mondiv/main/dividend_confirm_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.user == request.user:
+            self.object.delete()
+            messages.add_message(request, messages.SUCCESS, 'Запись удалена')
+            return HttpResponseRedirect(self.success_url)
+        else:
+            messages.add_message(request,messages.ERROR, 'Удаление невозможно, это не ваша запись')
+            return HttpResponseRedirect(self.success_url)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['company'] = self.object.company
+        return context
+
+
 class DividendsReceivedView(LoginRequiredMixin, ListView):
     model = Dividend
     context_object_name = 'dividends'
@@ -39,7 +76,8 @@ class DividendsReceivedView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Dividend.objects.filter(user=self.request.user) \
-            .annotate(total=F('amount_of_shares') * F('quantity_per_share'))
+            .annotate(total=F('amount_of_shares') * F('quantity_per_share'))\
+            .order_by('-id')[:50:-1]
 
 
 @login_required

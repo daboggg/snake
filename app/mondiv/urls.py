@@ -18,6 +18,8 @@ urlpatterns = [
     path('total_for_each_ticker/', total_for_each_ticker, name='total_for_each_ticker'),
     path('add_company/', add_company, name='add_company'),
     path('add_dividend/', AddDividendView.as_view(), name='add_dividend'),
+    path('dividend_update/<int:div_pk>/', DividendUpdateView.as_view(), name='dividend_update'),
+    path('dividend_delete/<int:div_pk>/', DividendDeleteView.as_view(), name='dividend_delete'),
     path('dividends_received/', DividendsReceivedView.as_view(), name='dividends_received'),
     path('', index, name='index'),
 ]

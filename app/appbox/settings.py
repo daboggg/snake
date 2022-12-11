@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mondiv.apps.MondivConfig',
     'bootstrap5',
-    'django_bootstrap_icons',
     'bootstrap_datepicker_plus',
+    'django_bootstrap_icons',
 ]
 
 MIDDLEWARE = [
