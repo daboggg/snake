@@ -60,7 +60,7 @@ class DividendDeleteView(LoginRequiredMixin, DeleteView):
             messages.add_message(request, messages.SUCCESS, 'Запись удалена')
             return HttpResponseRedirect(self.success_url)
         else:
-            messages.add_message(request,messages.ERROR, 'Удаление невозможно, это не ваша запись')
+            messages.add_message(request, messages.ERROR, 'Удаление невозможно, это не ваша запись')
             return HttpResponseRedirect(self.success_url)
 
     def get_context_data(self, **kwargs):
@@ -76,8 +76,8 @@ class DividendsReceivedView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Dividend.objects.filter(user=self.request.user) \
-            .annotate(total=F('amount_of_shares') * F('quantity_per_share'))\
-            .order_by('-id')[:50:-1]
+                   .annotate(total=F('amount_of_shares') * F('quantity_per_share')) \
+                   .order_by('-id')[:50:-1]
 
 
 @login_required
@@ -127,11 +127,14 @@ def profile(request):
         .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
         .values('currency__name') \
         .annotate(total=Sum('payment'))
-
-    return render(request, 'mondiv/auth/profile.html',{
-        res[0]['currency__name']: res[0]['total'],
-        res[1]['currency__name']: res[1]['total'],
-    })
+    ctx = {}
+    if res.count() == 0:
+        ctx['RUB'] = 0
+        ctx['USD'] = 0
+    else:
+        for r in res:
+            ctx[r['currency__name']] = r['total']
+    return render(request, 'mondiv/auth/profile.html', {**ctx})
 
 
 class MDLogoutView(LoginRequiredMixin, LogoutView):
@@ -178,7 +181,6 @@ def proba(request):
         .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
         .values('currency__name') \
         .annotate(total=Sum('payment'))
-
 
     return render(request, 'mondiv/main/proba.html', {'res': res})
 
@@ -233,6 +235,7 @@ def last_year(request):
         }
     })
 
+
 def last_n_years(request):
     year_now = datetime.now().year
     for_n_years = request.GET.get('for_n_years', 3)
@@ -251,7 +254,7 @@ def last_n_years(request):
     # формирует список по годам
     list_by_year = []
     count = 0
-    for y in range(year_now - (for_n_years-1), year_now + 1):
+    for y in range(year_now - (for_n_years - 1), year_now + 1):
         list_by_year.append([])
         for r in res:
             if str(y) == str(r['year']):
@@ -281,7 +284,8 @@ def last_n_years(request):
             'datasets': [
                 {
                     'data': ready_list[n],
-                    'label': 'Нет дивидендов' if len(list_by_year[n])==0 else 'Дивиденды за ' + str(list_by_year[n][0]["year"]) + ' год в '+str(currency) ,
+                    'label': 'Нет дивидендов' if len(list_by_year[n]) == 0 else 'Дивиденды за ' + str(
+                        list_by_year[n][0]["year"]) + ' год в ' + str(currency),
                 }
                 for n in range(for_n_years)
             ]
@@ -313,6 +317,7 @@ def last_n_years(request):
         }
     })
 
+
 def total_for_each_ticker(request):
     currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
@@ -343,14 +348,14 @@ def total_for_each_ticker(request):
                     },
                 },
                 'title': {
-                    'font':{
+                    'font': {
                         'size': 30
                     },
                     'display': 'true',
                     'text': f'Дивиденды по компаниям в {currency}'
                 },
                 'tooltip': {
-                    'titleFont':{
+                    'titleFont': {
                         'size': 20
                     },
                     'titleAlign': 'center',
@@ -359,6 +364,7 @@ def total_for_each_ticker(request):
             }
         }
     })
+
 
 def total_for_each_account(request):
     currency = request.GET.get('currency', 'USD')
