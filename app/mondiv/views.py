@@ -341,6 +341,7 @@ def total_for_each_ticker(request):
         'options': {
             'plugins': {
                 'legend': {
+                    'display': 0,
                     'labels': {
                         'font': {
                             'size': 18
