@@ -16,6 +16,7 @@ urlpatterns = [
     path('last_year/', last_year, name='last_year'),
     path('last_n_years/', last_n_years, name='last_n_years'),
     path('total_for_each_ticker/', total_for_each_ticker, name='total_for_each_ticker'),
+    path('total_for_each_account/', total_for_each_account, name='total_for_each_account'),
     path('add_company/', add_company, name='add_company'),
     path('add_dividend/', AddDividendView.as_view(), name='add_dividend'),
     path('dividend_update/<int:div_pk>/', DividendUpdateView.as_view(), name='dividend_update'),

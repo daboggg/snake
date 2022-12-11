@@ -21,6 +21,7 @@
                         <th scope="col">Иконка</th>
                         <th scope="col">Тикер</th>
                         <th scope="col">Название</th>
+                        <th scope="col">Валюта</th>
                         <th scope="col">Сумма</th>
                         <th scope="col">Дата</th>
                     </tr>
@@ -36,6 +37,7 @@
                             </td>
                             <td>{{ d.company.ticker }}</td>
                             <td>{{ d.company.name }}</td>
+                            <td>{{ d.currency.name }}</td>
                             <td>{{ d.total }}</td>
                             <td>{{ d.date_of_receipt }}</td>
                             <td>

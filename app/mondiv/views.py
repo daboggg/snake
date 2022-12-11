@@ -122,7 +122,16 @@ class MDLoginView(LoginView):
 
 @login_required
 def profile(request):
-    return render(request, 'mondiv/auth/profile.html')
+    res = Dividend.objects \
+        .filter(user=request.user) \
+        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
+        .values('currency__name') \
+        .annotate(total=Sum('payment'))
+
+    return render(request, 'mondiv/auth/profile.html',{
+        res[0]['currency__name']: res[0]['total'],
+        res[1]['currency__name']: res[1]['total'],
+    })
 
 
 class MDLogoutView(LoginRequiredMixin, LogoutView):
@@ -164,19 +173,14 @@ class RegisterDoneView(TemplateView):
 
 ###########  Charts json ######################################
 def proba(request):
-    currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
-        .filter(user=request.user, currency__name=currency, date_of_receipt__gt=datetime.now() - relativedelta(years=1)) \
-        .annotate(month=TruncMonth('date_of_receipt')) \
+        .filter(user=request.user) \
         .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
-        .values('month') \
-        .annotate(total=Sum('payment')) \
-        .order_by('month')
+        .values('currency__name') \
+        .annotate(total=Sum('payment'))
 
-    labels = [r['month'].strftime("%B") for r in res]
-    data = [r['total'] for r in res]
 
-    return render(request, 'mondiv/main/proba.html', {'t': labels, 'd': data})
+    return render(request, 'mondiv/main/proba.html', {'res': res})
 
 
 def last_year(request):
@@ -343,10 +347,57 @@ def total_for_each_ticker(request):
                         'size': 30
                     },
                     'display': 'true',
-                    'text': f'Дивиденды в {currency}'
+                    'text': f'Дивиденды по компаниям в {currency}'
                 },
                 'tooltip': {
                     'titleFont':{
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
+                }
+            }
+        }
+    })
+
+def total_for_each_account(request):
+    currency = request.GET.get('currency', 'USD')
+    res = Dividend.objects \
+        .filter(user=request.user, currency__name=currency, ) \
+        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
+        .values('account__name') \
+        .annotate(total=Sum('payment'))
+
+    return JsonResponse({
+        'type': 'polarArea',
+        'data': {
+            'labels': [r['account__name'] for r in res],
+            'datasets': [
+                {
+                    'data': [r['total'] for r in res],
+                    'label': f'Всего в  {currency}',
+                    'hoverOffset': 8
+                },
+            ]
+        },
+        'options': {
+            'plugins': {
+                'legend': {
+                    'labels': {
+                        'font': {
+                            'size': 18
+                        }
+                    },
+                },
+                'title': {
+                    'font': {
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Дивиденды на счетах в {currency}'
+                },
+                'tooltip': {
+                    'titleFont': {
                         'size': 20
                     },
                     'titleAlign': 'center',

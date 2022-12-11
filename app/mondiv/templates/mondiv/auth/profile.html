@@ -5,17 +5,20 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Профиль пользователя {{ user.username }}</h2>
-    {% if user.first_name %}
-        <p>Здравствуйте, {{ user.first_name }}!</p>
-    {% else %}
-        <p>Здравствуйте!</p>
-    {% endif %}
+    <div class="row text-center mt-4">
+        <h2>Профиль пользователя {{ user.username }}</h2>
+        {% if user.first_name %}
+            <p>Здравствуйте, {{ user.first_name }}!</p>
+        {% else %}
+            <h4>Здравствуйте!</h4>
+        {% endif %}
+    </div>
+
 
 
 
     <div class="container mt-5">
-        <div class="row mt-3">
+        <div class="row my-3">
             <div class="col-6">
 
                 <canvas id="myChart1" width="500" height="400"></canvas>
@@ -43,7 +46,7 @@
 
             </div>
         </div>
-        <div class="row mt-3">
+        <div class="row my-3">
             <div class="col-6">
 
                 <canvas id="myChart3" width="500" height="400"></canvas>
@@ -62,7 +65,7 @@
                 <canvas id="myChart4" width="500" height="400"></canvas>
 
                 <script type="text/javascript">
-                    $.get(({% url 'mondiv:last_n_years' %} + '?currency=RUB'), function (data) {
+                    $.get(({% url 'mondiv:last_n_years' %} +'?currency=RUB'), function (data) {
                         var ctx = $("#myChart4").get(0).getContext("2d");
                         new Chart(ctx, data);
                     });
@@ -71,7 +74,7 @@
 
             </div>
         </div>
-        <div class="row mt-3">
+        <div class="row my-3">
             <div class="col-6">
 
                 <canvas id="myChart5" width="500" height="400"></canvas>
@@ -90,12 +93,64 @@
                 <canvas id="myChart6" width="500" height="400"></canvas>
 
                 <script type="text/javascript">
-                    $.get(({% url 'mondiv:total_for_each_ticker' %} + '?currency=RUB'), function (data) {
+                    $.get(({% url 'mondiv:total_for_each_ticker' %} +'?currency=RUB'), function (data) {
                         var ctx = $("#myChart6").get(0).getContext("2d");
                         new Chart(ctx, data);
                     });
                 </script>
 
+
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col-6">
+
+                <canvas id="myChart7" width="500" height="400"></canvas>
+
+                <script type="text/javascript">
+                    $.get({% url 'mondiv:total_for_each_account' %}, function (data) {
+                        var ctx = $("#myChart7").get(0).getContext("2d");
+                        new Chart(ctx, data);
+                    });
+                </script>
+
+
+            </div>
+            <div class="col-6">
+
+                <canvas id="myChart8" width="500" height="400"></canvas>
+
+                <script type="text/javascript">
+                    $.get(({% url 'mondiv:total_for_each_account' %} +'?currency=RUB'), function (data) {
+                        var ctx = $("#myChart8").get(0).getContext("2d");
+                        new Chart(ctx, data);
+                    });
+                </script>
+
+
+            </div>
+        </div>
+        <div class="row my-5">
+            <div class="col-4 offset-1">
+
+                <div class="card text-bg-dark">
+                    <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
+                    <div class="card-img-overlay text-center">
+                        <h1 class="card-title mt-4 text-secondary">Всего в USD</h1>
+                        <div class="display-1 fw-bold text-secondary">{{ USD }}</div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-4 offset-2">
+
+                <div class="card text-bg-dark">
+                    <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
+                    <div class="card-img-overlay text-center">
+                        <h1 class="card-title mt-4 text-secondary">Всего в RUB</h1>
+                        <div class="display-1 fw-bold text-secondary">{{ RUB }}</div>
+                    </div>
+                </div>
 
             </div>
         </div>
