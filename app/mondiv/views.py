@@ -97,9 +97,10 @@ def add_company(request):
             else:
                 try:
                     res = client.get_ticker_details(ticker)
+                    print(res)
                     company = Company()
                     company.name = res.name
-                    company.ticker = res.company
+                    company.ticker = res.ticker
                     company.description = res.description
                     company.icon_url = res.branding.icon_url
                     company.get_remote_image()

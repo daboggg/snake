@@ -22,11 +22,16 @@
                 <div class="card">
                     <div class="row mt-3">
                         <div class="col-4 offset-4">
-                            <img src="{{ company.icon_image.url }}" class="card-img-top" alt="...">
+                            {% if company.icon_image %}
+                                <img src="{{ company.icon_image.url }}" class="card-img-top" alt="...">
+                            {% else %}
+                                <img src="https://i.postimg.cc/bwSyqTTF/empty.jpg" class="card-img-top" alt="...">
+                            {% endif %}
+
                         </div>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title text-center">{{ company.name}}</h3>
+                        <h3 class="card-title text-center">{{ company.name }}</h3>
                         <h4 class="card-subtitle mb-2 text-muted text-center">Тикер: {{ company.ticker }}</h4>
                         <p class="card-text">{{ company.description }}</p>
                     </div>
