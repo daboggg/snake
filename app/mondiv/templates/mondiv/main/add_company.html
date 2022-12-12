@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block content %}
+
+    {% bs_icon 'box-arrow-in-right' size='1.8em' color='green' as in_right %}
+
     <div class="container">
         <div class="row mt-5">
             <div class=" offset-4 col-4 mt-5">
@@ -22,7 +25,7 @@
             </div>
         </div>
         <div class="row mt-5">
-            <div class="col-10">
+            <div class="col-10 offset-1">
                 {% companies as companies %}
                 <table class="table align-middle">
                     <thead>
@@ -31,7 +34,7 @@
                         <th scope="col">Иконка</th>
                         <th scope="col">Тикер</th>
                         <th scope="col">Название</th>
-{#                        <th scope="col">Удалить</th>#}
+                        <th scope="col">Подробнее</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -45,9 +48,9 @@
                             </td>
                             <td>{{ c.ticker }}</td>
                             <td>{{ c.name }}</td>
-{#                            <td>#}
-{#                                <a href="">{% bs_icon 'x-lg' size='1.3em' color='red' %}</a>#}
-{#                            </td>#}
+                            <td>
+                                <a href="{% url 'mondiv:company' c.pk %}">{{ in_right }}</a>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

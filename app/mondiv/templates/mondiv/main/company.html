@@ -1,0 +1,37 @@
+{% extends 'mondiv/layout/basic.html' %}
+{% load bootstrap5 %}
+{% block title %}
+    {{ company.name }}
+{% endblock %}
+
+{% block content %}
+    <div class="display-4 my-6 text-center">Информация о компании: {{ company.name }}</div>
+    <div class="container mt-5">
+        <div class="row my-3">
+            <div class="col-6">
+                <canvas id="myChart1" width="500" height="400"></canvas>
+
+                <script type="text/javascript">
+                    $.get({% url 'mondiv:dividend_history' %} +'?ticker={{ company.ticker }}', function (data) {
+                        var ctx = $("#myChart1").get(0).getContext("2d");
+                        new Chart(ctx, data);
+                    });
+                </script>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="row mt-3">
+                        <div class="col-4 offset-4">
+                            <img src="{{ company.icon_image.url }}" class="card-img-top" alt="...">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title text-center">{{ company.name}}</h3>
+                        <h4 class="card-subtitle mb-2 text-muted text-center">Тикер: {{ company.ticker }}</h4>
+                        <p class="card-text">{{ company.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

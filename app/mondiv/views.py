@@ -1,3 +1,5 @@
+import os
+
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -12,6 +14,9 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView, CreateView, TemplateView, ListView, DeleteView
+
+import requests
+from polygon import RESTClient
 
 from mondiv.forms import SearchCompanyForm, ChangeUserInfoForm, AddDividendForm
 from mondiv.models import Company, Dividend
@@ -94,7 +99,7 @@ def add_company(request):
                     res = client.get_ticker_details(ticker)
                     company = Company()
                     company.name = res.name
-                    company.ticker = res.ticker
+                    company.ticker = res.company
                     company.description = res.description
                     company.icon_url = res.branding.icon_url
                     company.get_remote_image()
@@ -113,6 +118,14 @@ def add_company(request):
 
 def index(request):
     return render(request, 'mondiv/main/index.html')
+
+
+def company(request, company_pk):
+    try:
+        company = Company.objects.get(pk=company_pk)
+    except Exception as e:
+        messages.add_message(request,messages.ERROR, e)
+    return render(request, 'mondiv/main/company.html',{'company': company})
 
 
 ##########  AUTH  #############################################################
@@ -176,12 +189,12 @@ class RegisterDoneView(TemplateView):
 
 ###########  Charts json ######################################
 def proba(request):
-    res = Dividend.objects \
-        .filter(user=request.user) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
-        .values('currency__name') \
-        .annotate(total=Sum('payment'))
+    ticker = request.GET.get('ticker', 'MTSS')
+    url = f'http://iss.moex.com/iss/securities/{ticker}/dividends.json'
 
+    res = requests.get(url)
+    res = res.json()['dividends']['data']
+    res = [[r[3] for r in res],[r[2] for r in res]]
     return render(request, 'mondiv/main/proba.html', {'res': res})
 
 
@@ -413,3 +426,62 @@ def total_for_each_account(request):
             }
         }
     })
+
+def dividend_history(request):
+    ticker = request.GET.get('ticker')
+    limit = request.GET.get('limit', 40)
+    apiKey = os.environ.get("POLYGON_API_KEY") or 'slfhowwfy'
+
+    url = f'https://api.polygon.io/v3/reference/dividends?ticker={ticker}&limit={limit}&apiKey={apiKey}'
+
+    res = requests.get(url)
+    if len(res.json()['results']) != 0:
+        res = res.json()['results']
+        res = [[r['cash_amount'] for r in reversed(res)], [r['ex_dividend_date'] for r in reversed(res)]]
+    else:
+        url = f'http://iss.moex.com/iss/securities/{ticker}/dividends.json'
+        res = requests.get(url)
+        res = res.json()['dividends']['data']
+        res = [[r[3] for r in res], [r[2] for r in res]]
+    return JsonResponse({
+        'type': 'bar',
+        'data': {
+            'labels': res[1],
+            'datasets': [
+                {
+                    'data': res[0],
+                    'label': 'выплата',
+                },
+            ]
+        },
+        'options': {
+            'plugins': {
+                'legend': {
+                    'display': 0,
+                    'labels': {
+                        'font': {
+                            'size': 18
+                        }
+                    },
+                },
+                'tooltip': {
+                    'titleFont': {
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
+                },
+                'title': {
+                    'font': {
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Дивиденды, последние 40 выплат'
+                },
+            }
+        }
+    })
+
+
+
+
