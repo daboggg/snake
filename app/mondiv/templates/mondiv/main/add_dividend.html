@@ -2,7 +2,7 @@
 {% load bootstrap5 %}
 
 {% block title %}
-Добавить дивиденд
+    Добавить дивиденд
 {% endblock %}
 
 {% block content %}
@@ -12,7 +12,51 @@
                 {{ form.media }}
                 <form method="post">
                     {% csrf_token %}
-                    {% bootstrap_form form %}
+
+
+                    {#                                        <p><label class="form-label" for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>{{ form.company }}</p>#}
+                    {#                                        <div class="form-error">{{ form.company.errors }}</div>#}
+
+
+                    {#                    {% bootstrap_form form %}#}
+                    {#                {{ form.company.field.choises.queryset }}#}
+
+                    {#                {{ form.company }}#}
+
+                    {#                {% for c in form.company.field.choices.queryset %}#}
+                    {#                    {{ c.name }}#}
+                    {#                {% endfor %}#}
+
+                    {#                                    {% for f in form %}#}
+                    {#                                        {{ f }}#}
+                    {#                                    {% endfor %}#}
+
+                    {#                forloop.counter#}
+
+                    {% for f in form %}
+                        {% if forloop.counter == 1 %}
+                            <div class="mb-3">
+                                <label class="form-label" for="id_company">Компания</label>
+                                <select name="company" class="form-select select-lan" title="" required=""
+                                        id="id_company">
+                                    <option selected disabled>Выбери компанию</option>
+
+                                    {% for company in form.company.field.choices.queryset %}
+                                        <option value="{{ company.id }}">{{ company.name }}  ({{ company.ticker }})</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-error">{{ form.company.errors }}</div>
+                            </div>
+                        {% else %}
+                            <div class="mb-3">
+                                <label class="form-label"
+                                       for="{{ f.id_for_label }}">{{ f.label }}</label>
+                                {{ f }}
+                                <div class="form-error">{{ f.errors }}</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
                     {% buttons %}
                         <button type="submit" class="btn btn-secondary">
                             Добавить
@@ -22,4 +66,9 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select-lan').select2();
+        });
+    </script>
 {% endblock %}

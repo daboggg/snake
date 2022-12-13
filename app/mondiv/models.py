@@ -12,12 +12,20 @@ class Currency(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Валюта'
+        verbose_name_plural = 'Вылюты'
+
 class Account(models.Model):
     name = models.CharField(max_length=100, verbose_name='Брокерский счет')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Владелец счета')
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Счет'
+        verbose_name_plural = 'Счета'
 
 
 
@@ -27,7 +35,7 @@ class Company(models.Model):
     description = models.CharField(max_length=3000, verbose_name='О компании')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     icon_image = models.ImageField(upload_to='images/icon', verbose_name='Иконка', null=True)
-    icon_url = models.URLField(null=True)
+    icon_url = models.URLField(null=True, blank=True)
 
     # def delete(self, *args, **kwargs):
     #     # До удаления записи получаем необходимую информацию
@@ -70,4 +78,3 @@ class Dividend(models.Model):
     class Meta:
         verbose_name = 'Дивиденд'
         verbose_name_plural = 'Дивиденды'
-        # ordering = ['-date_of_receipt']

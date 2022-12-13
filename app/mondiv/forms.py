@@ -1,7 +1,8 @@
 from bootstrap_datepicker_plus.widgets import DatePickerInput
 from django import forms
 from django.contrib.auth.models import User
-from mondiv.models import Dividend
+
+from mondiv.models import Dividend, Company
 
 
 class AddDividendForm(forms.ModelForm):
@@ -9,7 +10,12 @@ class AddDividendForm(forms.ModelForm):
         model=Dividend
         fields = ('company','date_of_receipt','amount_of_shares','quantity_per_share','currency','account')
         widgets = {
-            'date_of_receipt': DatePickerInput(format='%dd:%mm:%YYYY')
+            'company': forms.Select(attrs={'class': 'form-select'}),
+            'date_of_receipt': DatePickerInput(format='%dd:%mm:%YYYY', attrs={'class': 'form-control'}),
+            'amount_of_shares': forms.NumberInput(attrs={'class': 'form-control'}),
+            'quantity_per_share': forms.NumberInput(attrs={'class': 'form-control'}),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'account': forms.Select(attrs={'class': 'form-select'}),
         }
 
 
