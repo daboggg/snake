@@ -12,7 +12,8 @@ from django.db.models import F, Count, Sum, DateField
 from django.db.models.functions import TruncMonth, TruncYear
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.utils.http import urlencode
 from django.views.generic import UpdateView, CreateView, TemplateView, ListView, DeleteView
 
 import requests
@@ -97,17 +98,19 @@ def add_company(request):
             else:
                 try:
                     res = client.get_ticker_details(ticker)
-                    print(res)
                     company = Company()
                     company.name = res.name
                     company.ticker = res.ticker
                     company.description = res.description
                     company.icon_url = res.branding.icon_url
                     company.get_remote_image()
-
+                    saved_company = Company.objects.get(name=res.name)
                     messages.add_message(request, messages.INFO,
                                          f"Компания: {res.name}, с тикером: {ticker} успешно добавлена")
-                    return redirect('mondiv:add_dividend')
+
+                    # редирект на урл с гет параметрами сохраненной компании
+                    return redirect('{}?{}'.format(reverse('mondiv:add_dividend'), urlencode({'company_name': f'{saved_company.name} ({saved_company.ticker})', 'id':saved_company.id})))
+
                 except Exception as e:
                     messages.add_message(request, messages.ERROR, e)
                     return render(request, 'mondiv/main/add_company.html', {'form': SearchCompanyForm()})

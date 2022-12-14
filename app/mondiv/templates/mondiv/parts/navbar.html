@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg bg-secondary navbar-dark">
+<nav class="navbar navbar-expand-lg bg-secondary navbar-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'mondiv:index' %}">Монитор дивидендов</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -9,18 +9,20 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 {% if user.is_authenticated%}
+                    {% with request.resolver_match.url_name as url_name %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mondiv:add_company' %}">Добавить компанию</a>
+                        <a class="nav-link {%if url_name == 'add_company'%}active{% endif %}" href="{% url 'mondiv:add_company' %}">Добавить компанию</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mondiv:add_dividend' %}">Добавить дивиденд</a>
+                        <a class="nav-link {%if url_name == 'add_dividend'%}active{% endif %}" href="{% url 'mondiv:add_dividend' %}">Добавить дивиденд</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mondiv:dividends_received' %}">Полученные дивиденды</a>
+                        <a class="nav-link {%if url_name == 'dividends_received'%}active{% endif %}" href="{% url 'mondiv:dividends_received' %}">Полученные дивиденды</a>
                     </li>
 {#                    <li class="nav-item">#}
 {#                        <a class="nav-link" href="{% url 'mondiv:proba' %}">Проба</a>#}
 {#                    </li>#}
+                    {% endwith %}
                 {% endif %}
 
             </ul>

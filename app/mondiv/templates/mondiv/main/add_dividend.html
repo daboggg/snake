@@ -6,6 +6,8 @@
 {% endblock %}
 
 {% block content %}
+
+
     <div class="container">
         <div class="row mt-5">
             <div class=" offset-4 col-4 mt-5">
@@ -13,33 +15,17 @@
                 <form method="post">
                     {% csrf_token %}
 
-
-                    {#                                        <p><label class="form-label" for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>{{ form.company }}</p>#}
-                    {#                                        <div class="form-error">{{ form.company.errors }}</div>#}
-
-
-                    {#                    {% bootstrap_form form %}#}
-                    {#                {{ form.company.field.choises.queryset }}#}
-
-                    {#                {{ form.company }}#}
-
-                    {#                {% for c in form.company.field.choices.queryset %}#}
-                    {#                    {{ c.name }}#}
-                    {#                {% endfor %}#}
-
-                    {#                                    {% for f in form %}#}
-                    {#                                        {{ f }}#}
-                    {#                                    {% endfor %}#}
-
-                    {#                forloop.counter#}
-
                     {% for f in form %}
                         {% if forloop.counter == 1 %}
                             <div class="mb-3">
                                 <label class="form-label" for="id_company">Компания</label>
-                                <select name="company" class="form-select select-lan" title="" required=""
+                                <select  name="company" class="form-select select-lan" title="" required=""
                                         id="id_company">
+                                    {% if request.GET.company_name %}
+                                    <option value="{{ request.GET.id }}" selected>{{ request.GET.company_name }}</option>
+                                    {% else %}
                                     <option selected disabled>Выбери компанию</option>
+                                    {% endif %}
 
                                     {% for company in form.company.field.choices.queryset %}
                                         <option value="{{ company.id }}">{{ company.name }}  ({{ company.ticker }})</option>
