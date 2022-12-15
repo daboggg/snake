@@ -8,20 +8,26 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                {% if user.is_authenticated%}
+                {% if user.is_authenticated %}
                     {% with request.resolver_match.url_name as url_name %}
-                    <li class="nav-item">
-                        <a class="nav-link {%if url_name == 'add_company'%}active{% endif %}" href="{% url 'mondiv:add_company' %}">Добавить компанию</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {%if url_name == 'add_dividend'%}active{% endif %}" href="{% url 'mondiv:add_dividend' %}">Добавить дивиденд</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {%if url_name == 'dividends_received'%}active{% endif %}" href="{% url 'mondiv:dividends_received' %}">Полученные дивиденды</a>
-                    </li>
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link" href="{% url 'mondiv:proba' %}">Проба</a>#}
-{#                    </li>#}
+                        <li class="nav-item">
+                            <a class="nav-link {% if url_name == 'add_company' %}active{% endif %}"
+                               href="{% url 'mondiv:add_company' %}">Добавить компанию</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if url_name == 'add_dividend' %}active{% endif %}"
+                               href="{% url 'mondiv:add_dividend' %}">Добавить дивиденд</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if url_name == 'dividends_received' %}active{% endif %}"
+                               href="{% url 'mondiv:dividends_received' %}">Полученные дивиденды</a>
+                        </li>
+{#                                            <li class="nav-item">#}
+{#                                                <a class="nav-link" href="{% url 'mondiv:proba' %}">Проба</a>#}
+{#                                            </li>#}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Админ панель</a>
+                        </li>
                     {% endwith %}
                 {% endif %}
 
@@ -29,20 +35,22 @@
             <ul class="navbar-nav justify-content-end">
                 {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ user.username }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{% url 'mondiv:profile' %}">Профиль</a></li>
-                        <li><a class="dropdown-item" href="{% url 'mondiv:profile_change' %}">Изменить личные данные</a></li>
-                        <li><a class="dropdown-item" href="{% url 'mondiv:password_change' %}">Изменить пароль</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="{% url 'mondiv:logout' %}">Выйти</a></li>
-                    </ul>
-                </li>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'mondiv:profile' %}">Профиль</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mondiv:profile_change' %}">Изменить личные
+                                данные</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mondiv:password_change' %}">Изменить пароль</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'mondiv:logout' %}">Выйти</a></li>
+                        </ul>
+                    </li>
                 {% else %}
                     <li class="nav-item">
                         <a disabled="true" class="nav-link" href="{% url 'mondiv:register' %}">Регистрация</a>

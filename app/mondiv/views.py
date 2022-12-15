@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import F, Count, Sum, DateField
+from django.db.models import F, Count, Sum, DateField, Min, Subquery
 from django.db.models.functions import TruncMonth, TruncYear
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
@@ -109,7 +109,8 @@ def add_company(request):
                                          f"Компания: {res.name}, с тикером: {ticker} успешно добавлена")
 
                     # редирект на урл с гет параметрами сохраненной компании
-                    return redirect('{}?{}'.format(reverse('mondiv:add_dividend'), urlencode({'company_name': f'{saved_company.name} ({saved_company.ticker})', 'id':saved_company.id})))
+                    return redirect('{}?{}'.format(reverse('mondiv:add_dividend'), urlencode(
+                        {'company_name': f'{saved_company.name} ({saved_company.ticker})', 'id': saved_company.id})))
 
                 except Exception as e:
                     messages.add_message(request, messages.ERROR, e)
@@ -124,12 +125,13 @@ def index(request):
     return render(request, 'mondiv/main/index.html')
 
 
+# подробно про компанию (дивиденты и инфо)
 def company(request, company_pk):
     try:
         company = Company.objects.get(pk=company_pk)
     except Exception as e:
-        messages.add_message(request,messages.ERROR, e)
-    return render(request, 'mondiv/main/company.html',{'company': company})
+        messages.add_message(request, messages.ERROR, e)
+    return render(request, 'mondiv/main/company.html', {'company': company})
 
 
 ##########  AUTH  #############################################################
@@ -141,17 +143,38 @@ class MDLoginView(LoginView):
 def profile(request):
     res = Dividend.objects \
         .filter(user=request.user) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
-        .values('currency__name') \
+        .annotate(payment=F('amount_of_shares') * F('quantity_per_share'))
+
+    total = res.values('currency__name') \
         .annotate(total=Sum('payment'))
     ctx = {}
-    if res.count() == 0:
+    if total.count() == 0:
         ctx['RUB'] = 0
         ctx['USD'] = 0
     else:
-        for r in res:
-            ctx[r['currency__name']] = r['total']
-    return render(request, 'mondiv/auth/profile.html', {**ctx})
+        for item in total:
+            ctx[item['currency__name']] = item['total']
+
+    # минимальная и максимальная выплата в рублях по тикеру
+    payout_ticker_rub = res.filter(currency__name='RUB') \
+        .values('company__name', 'payment') \
+        .order_by('payment')
+    minimum_payout_ticker_rub = payout_ticker_rub.first()
+    maximum_payout_ticker_rub = payout_ticker_rub.last()
+
+    # минимальная и максимальная выплата в долларах по тикеру
+    payout_ticker_usd = res.filter(currency__name='USD') \
+        .values('company__name', 'payment') \
+        .order_by('payment')
+    minimum_payout_ticker_usd = payout_ticker_usd.first()
+    maximum_payout_ticker_usd = payout_ticker_usd.last()
+
+    ctx['minimum_payout_ticker_rub'] = minimum_payout_ticker_rub
+    ctx['maximum_payout_ticker_rub'] = maximum_payout_ticker_rub
+    ctx['minimum_payout_ticker_usd'] = minimum_payout_ticker_usd
+    ctx['maximum_payout_ticker_usd'] = maximum_payout_ticker_usd
+
+    return render(request, 'mondiv/auth/profile.html', ctx)
 
 
 class MDLogoutView(LoginRequiredMixin, LogoutView):
@@ -193,15 +216,47 @@ class RegisterDoneView(TemplateView):
 
 ###########  Charts json ######################################
 def proba(request):
-    ticker = request.GET.get('ticker', 'MTSS')
-    url = f'http://iss.moex.com/iss/securities/{ticker}/dividends.json'
+    res = Dividend.objects \
+        .filter(user=request.user) \
+        .annotate(payment=F('amount_of_shares') * F('quantity_per_share'))
 
-    res = requests.get(url)
-    res = res.json()['dividends']['data']
-    res = [[r[3] for r in res],[r[2] for r in res]]
-    return render(request, 'mondiv/main/proba.html', {'res': res})
+    total = res.values('currency__name') \
+            .annotate(total=Sum('payment'))
+    ctx = {}
+    if total.count() == 0:
+        ctx['RUB'] = 0
+        ctx['USD'] = 0
+    else:
+        for item in total:
+            ctx[item['currency__name']] = item['total']
+
+    # минимальная и максимальная выплата в рублях по тикеру
+    payout_ticker_rub = res.filter(currency__name='RUB')\
+        .values('company__name', 'payment')\
+        .order_by('payment')
+    minimum_payout_ticker_rub = payout_ticker_rub.first()
+    maximum_payout_ticker_rub = payout_ticker_rub.last()
+
+    # минимальная и максимальная выплата в долларах по тикеру
+    payout_ticker_usd = res.filter(currency__name='USD') \
+        .values('company__name', 'payment') \
+        .order_by('payment')
+    minimum_payout_ticker_usd = payout_ticker_usd.first()
+    maximum_payout_ticker_usd = payout_ticker_usd.last()
 
 
+
+
+
+    ctx['minimum_payout_ticker_rub'] = minimum_payout_ticker_rub
+    ctx['maximum_payout_ticker_rub'] = maximum_payout_ticker_rub
+    ctx['minimum_payout_ticker_usd'] = minimum_payout_ticker_usd
+    ctx['maximum_payout_ticker_usd'] = maximum_payout_ticker_usd
+
+    return render(request, 'mondiv/main/proba.html', {'res': ctx})
+
+
+@login_required()
 def last_year(request):
     currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
@@ -253,6 +308,7 @@ def last_year(request):
     })
 
 
+@login_required()
 def last_n_years(request):
     year_now = datetime.now().year
     for_n_years = request.GET.get('for_n_years', 3)
@@ -335,6 +391,7 @@ def last_n_years(request):
     })
 
 
+@login_required()
 def total_for_each_ticker(request):
     currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
@@ -384,6 +441,7 @@ def total_for_each_ticker(request):
     })
 
 
+@login_required()
 def total_for_each_account(request):
     currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
@@ -431,6 +489,8 @@ def total_for_each_account(request):
         }
     })
 
+
+@login_required()
 def dividend_history(request):
     ticker = request.GET.get('ticker')
     limit = request.GET.get('limit', 40)
@@ -480,12 +540,8 @@ def dividend_history(request):
                         'size': 30
                     },
                     'display': 'true',
-                    'text': f'Дивиденды, последние 40 выплат'
+                    'text': f'Дивиденды, последние {limit} выплат'
                 },
             }
         }
     })
-
-
-
-
