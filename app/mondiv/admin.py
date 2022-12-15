@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from mondiv.models import Company, Account, Currency, Dividend
 
 class DividendAdmin(admin.ModelAdmin):
-    list_display = (
+    list_display = ('id',
         'company','date_of_receipt',
         'amount_of_shares','quantity_per_share'
         ,'currency','account')
@@ -14,7 +14,7 @@ class DividendAdmin(admin.ModelAdmin):
 
 
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = (
+    list_display = ('id',
         'name', 'ticker', 'time_create', 'get_html_photo')
     list_display_links = ('ticker', 'name')
     search_fields = ('name', 'ticker')

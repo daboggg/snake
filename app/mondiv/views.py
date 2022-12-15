@@ -81,9 +81,10 @@ class DividendsReceivedView(LoginRequiredMixin, ListView):
     template_name = 'mondiv/main/dividends_received.html'
 
     def get_queryset(self):
+        limit = self.request.GET.get('limit', 50)
         return Dividend.objects.filter(user=self.request.user) \
                    .annotate(total=F('amount_of_shares') * F('quantity_per_share')) \
-                   .order_by('-id')[:50:-1]
+                   .order_by('-id')[:int(limit):-1]
 
 
 @login_required
@@ -169,10 +170,17 @@ def profile(request):
     minimum_payout_ticker_usd = payout_ticker_usd.first()
     maximum_payout_ticker_usd = payout_ticker_usd.last()
 
+    # количество выплат
+    number_payments = res.values('currency__name') \
+                        .annotate(number_payments=Count('id'))
+
+    # контекст
     ctx['minimum_payout_ticker_rub'] = minimum_payout_ticker_rub
     ctx['maximum_payout_ticker_rub'] = maximum_payout_ticker_rub
     ctx['minimum_payout_ticker_usd'] = minimum_payout_ticker_usd
     ctx['maximum_payout_ticker_usd'] = maximum_payout_ticker_usd
+    for n in number_payments:
+        ctx[n['currency__name'] + '_p'] = n
 
     return render(request, 'mondiv/auth/profile.html', ctx)
 
@@ -244,6 +252,10 @@ def proba(request):
     minimum_payout_ticker_usd = payout_ticker_usd.first()
     maximum_payout_ticker_usd = payout_ticker_usd.last()
 
+    # количество выплат
+    number_payments = res.values('currency__name')\
+                            .annotate(number_payments=Count('id'))
+
 
 
 
@@ -252,6 +264,8 @@ def proba(request):
     ctx['maximum_payout_ticker_rub'] = maximum_payout_ticker_rub
     ctx['minimum_payout_ticker_usd'] = minimum_payout_ticker_usd
     ctx['maximum_payout_ticker_usd'] = maximum_payout_ticker_usd
+    for n in number_payments:
+        ctx[n['currency__name']+'_p'] = n
 
     return render(request, 'mondiv/main/proba.html', {'res': ctx})
 

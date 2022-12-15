@@ -12,7 +12,7 @@
     <div class="container">
         <div class="row text-center mt-5"><h1>Последние 50 выплат</h1></div>
         <div class="row mt-5">
-            <div class="col-10 offset-1">
+            <div class="col text-center">
                 <table class="table align-middle">
                     <thead>
                     <tr>
@@ -23,6 +23,7 @@
                         <th scope="col">Валюта</th>
                         <th scope="col">Сумма</th>
                         <th scope="col">Дата</th>
+                        <th scope="col">Счет</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -41,6 +42,7 @@
                             <td>{{ d.currency.name }}</td>
                             <td>{{ d.total | floatformat:2 }}</td>
                             <td>{{ d.date_of_receipt }}</td>
+                            <td>{{ d.account.name }}</td>
                             <td>
                                 <a href="{% url 'mondiv:dividend_update' d.pk %}">{{ pencil }}</a>
                             </td>

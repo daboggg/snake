@@ -139,6 +139,7 @@
                         <h3 class="card-title mt-4 text-secondary">USD</h3>
                         <h6>минимальная выплата у {{ minimum_payout_ticker_usd.company__name }} : {{ minimum_payout_ticker_usd.payment | floatformat:2  }}</h6>
                         <h6>максимальная выплата у {{ maximum_payout_ticker_usd.company__name }} : {{ maximum_payout_ticker_usd.payment | floatformat:2  }}</h6>
+                        <h6>число выплат дивидендов: {{ USD_p.number_payments }}</h6>
                     </div>
                 </div>
 
@@ -151,6 +152,7 @@
                         <h3 class="card-title mt-4 text-secondary">RUB</h3>
                         <h6>минимальная выплата у {{ minimum_payout_ticker_rub.company__name }} : {{ minimum_payout_ticker_rub.payment | floatformat:2  }}</h6>
                         <h6>максимальная выплата у {{ maximum_payout_ticker_rub.company__name }} : {{ maximum_payout_ticker_rub.payment | floatformat:2  }}</h6>
+                        <h6>число выплат дивидендов: {{ RUB_p.number_payments }}</h6>
                     </div>
                 </div>
 
