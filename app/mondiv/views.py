@@ -1,5 +1,6 @@
 import os
 
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -19,11 +20,11 @@ from django.views.generic import UpdateView, CreateView, TemplateView, ListView,
 import requests
 from polygon import RESTClient
 
-from mondiv.forms import SearchCompanyForm, ChangeUserInfoForm, AddDividendForm
+from mondiv.forms import SearchCompanyForm, ChangeUserInfoForm, AddDividendForm, DividendPeriodForm
 from mondiv.models import Company, Dividend
 from mondiv.utils import client, get_month_list
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 
 class AddDividendView(LoginRequiredMixin, CreateView):
@@ -81,10 +82,26 @@ class DividendsReceivedView(LoginRequiredMixin, ListView):
     template_name = 'mondiv/main/dividends_received.html'
 
     def get_queryset(self):
+        # Фильтрация по диапазону дат
+        if self.request.GET and self.request.GET['start'] and self.request.GET['end']:
+            start = self.request.GET['start']
+            end = self.request.GET['end']
+            return Dividend.objects.filter(user=self.request.user, date_of_receipt__range=[start,end]) \
+                   .annotate(total=F('amount_of_shares') * F('quantity_per_share'))
+
+        # Возвращает по умолчанию 50 последних записей
         limit = self.request.GET.get('limit', 50)
         return Dividend.objects.filter(user=self.request.user) \
                    .annotate(total=F('amount_of_shares') * F('quantity_per_share')) \
                    .order_by('-id')[:int(limit):-1]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET and self.request.GET['start'] and self.request.GET['end']:
+            context['start'] = datetime.strptime(self.request.GET['start'], '%Y-%m-%d').date()
+            context['end'] = datetime.strptime(self.request.GET['end'], '%Y-%m-%d').date()
+        context['form'] = DividendPeriodForm()
+        return context
 
 
 @login_required

@@ -3,14 +3,57 @@
 {% load bootstrap_icons %}
 {% load my_tags_and_filters %}
 {% block title %}
-Полученные дивиденды
+    Полученные дивиденды
 {% endblock %}
 
 {% block content %}
     {% bs_icon 'pencil' size='1.3em' color='black' as pencil %}
     {% bs_icon 'x-lg' size='1.3em' color='red' as xlg %}
     <div class="container">
-        <div class="row text-center mt-5"><h1>Последние 50 выплат</h1></div>
+
+        <p class="mt-4">
+            {% if start and end %}
+                <a class="btn btn-secondary" href="{% url 'mondiv:dividends_received' %}">Последние 50 выплат</a>
+            {% else %}
+            <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample"
+                    aria-expanded="false" aria-controls="collapseExample">
+                Выбрать период
+            </button>
+            {% endif %} 
+        </p>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+                {{ form.media }}
+                <form method="get">
+                    <div class="row mt-4">
+                        <div class="col-4">
+                            {{ form.start }}
+                        </div>
+                        <div class="col-4">
+                            {{ form.end }}
+                        </div>
+                        <div class="col-2">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-secondary">
+                                    Выбрать
+                                </button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <div class="row text-center mt-5"><h1>
+            {% if start and end %}
+            Выплаты с {{ start }} по {{ end }}
+            {% else %}
+            Последние 50 выплат
+            {% endif %}
+        </h1></div>
+
+
         <div class="row mt-5">
             <div class="col text-center">
                 <table class="table align-middle">
@@ -33,7 +76,8 @@
                             <td>
                                 {% if d.company.icon_image %}
                                     <a href="{% url 'mondiv:company' d.company.pk %}">
-                                        <img style="width: 40px" src="{{ d.company.icon_image.url }}" class="img-thumbnail" alt="">
+                                        <img style="width: 40px" src="{{ d.company.icon_image.url }}"
+                                             class="img-thumbnail" alt="">
                                     </a>
                                 {% endif %}
                             </td>
