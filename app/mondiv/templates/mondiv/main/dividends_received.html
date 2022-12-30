@@ -64,7 +64,6 @@
                         <th scope="col">Тикер</th>
                         <th scope="col">Название</th>
                         <th scope="col">Валюта</th>
-                        <th scope="col">Сумма</th>
                         <th scope="col">Выплата</th>
                         <th scope="col">Дата</th>
                         <th scope="col">Счет</th>
@@ -85,8 +84,7 @@
                             <td>{{ d.company.ticker }}</td>
                             <td>{{ d.company.name }}</td>
                             <td>{{ d.currency.name }}</td>
-                            <td>{{ d.total | floatformat:2 }}</td>
-                            <td>{{ d.payoff }}</td>
+                            <td>{{ d.payoff | floatformat:2 }}</td>
                             <td>{{ d.date_of_receipt }}</td>
                             <td>{{ d.account.name }}</td>
                             <td>

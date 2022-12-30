@@ -6,7 +6,7 @@ from mondiv.models import Company, Account, Currency, Dividend
 class DividendAdmin(admin.ModelAdmin):
     list_display = ('id',
         'company','date_of_receipt',
-        'amount_of_shares','quantity_per_share'
+        'payoff'
         ,'currency','account')
     list_display_links = ('company',)
     search_fields = ('company',)

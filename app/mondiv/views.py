@@ -86,13 +86,11 @@ class DividendsReceivedView(LoginRequiredMixin, ListView):
         if self.request.GET and self.request.GET['start'] and self.request.GET['end']:
             start = self.request.GET['start']
             end = self.request.GET['end']
-            return Dividend.objects.filter(user=self.request.user, date_of_receipt__range=[start,end]) \
-                   .annotate(total=F('amount_of_shares') * F('quantity_per_share'))
+            return Dividend.objects.filter(user=self.request.user, date_of_receipt__range=[start,end])
 
         # Возвращает по умолчанию 50 последних записей
         limit = self.request.GET.get('limit', 50)
         return Dividend.objects.filter(user=self.request.user) \
-                   .annotate(total=F('amount_of_shares') * F('quantity_per_share')) \
                    .order_by('-id')[:int(limit):-1]
 
     def get_context_data(self, **kwargs):
@@ -160,11 +158,10 @@ class MDLoginView(LoginView):
 @login_required
 def profile(request):
     res = Dividend.objects \
-        .filter(user=request.user) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share'))
+        .filter(user=request.user)
 
     total = res.values('currency__name') \
-        .annotate(total=Sum('payment'))
+        .annotate(total=Sum('payoff'))
     ctx = {}
     if total.count() == 0:
         ctx['RUB'] = 0
@@ -175,15 +172,15 @@ def profile(request):
 
     # минимальная и максимальная выплата в рублях по тикеру
     payout_ticker_rub = res.filter(currency__name='RUB') \
-        .values('company__name', 'payment') \
-        .order_by('payment')
+        .values('company__name', 'payoff') \
+        .order_by('payoff')
     minimum_payout_ticker_rub = payout_ticker_rub.first()
     maximum_payout_ticker_rub = payout_ticker_rub.last()
 
     # минимальная и максимальная выплата в долларах по тикеру
     payout_ticker_usd = res.filter(currency__name='USD') \
-        .values('company__name', 'payment') \
-        .order_by('payment')
+        .values('company__name', 'payoff') \
+        .order_by('payoff')
     minimum_payout_ticker_usd = payout_ticker_usd.first()
     maximum_payout_ticker_usd = payout_ticker_usd.last()
 
@@ -242,11 +239,10 @@ class RegisterDoneView(TemplateView):
 ###########  Charts json ######################################
 def proba(request):
     res = Dividend.objects \
-        .filter(user=request.user) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share'))
+        .filter(user=request.user)
 
     total = res.values('currency__name') \
-            .annotate(total=Sum('payment'))
+            .annotate(total=Sum('payoff'))
     ctx = {}
     if total.count() == 0:
         ctx['RUB'] = 0
@@ -257,15 +253,15 @@ def proba(request):
 
     # минимальная и максимальная выплата в рублях по тикеру
     payout_ticker_rub = res.filter(currency__name='RUB')\
-        .values('company__name', 'payment')\
-        .order_by('payment')
+        .values('company__name', 'payoff')\
+        .order_by('payoff')
     minimum_payout_ticker_rub = payout_ticker_rub.first()
     maximum_payout_ticker_rub = payout_ticker_rub.last()
 
     # минимальная и максимальная выплата в долларах по тикеру
     payout_ticker_usd = res.filter(currency__name='USD') \
-        .values('company__name', 'payment') \
-        .order_by('payment')
+        .values('company__name', 'payoff') \
+        .order_by('payoff')
     minimum_payout_ticker_usd = payout_ticker_usd.first()
     maximum_payout_ticker_usd = payout_ticker_usd.last()
 
@@ -293,9 +289,8 @@ def last_year(request):
     res = Dividend.objects \
         .filter(user=request.user, currency__name=currency, date_of_receipt__gt=datetime.now() - relativedelta(years=1)) \
         .annotate(month=TruncMonth('date_of_receipt')) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
         .values('month') \
-        .annotate(total=Sum('payment')) \
+        .annotate(total=Sum('payoff')) \
         .order_by('month')
 
     labels = [r['month'].strftime("%B") for r in res]
@@ -348,9 +343,8 @@ def last_n_years(request):
         .filter(user=request.user, date_of_receipt__gt=f'{year_now - (for_n_years - 1)}-01-01', currency__name=currency) \
         .annotate(month=TruncMonth('date_of_receipt')) \
         .annotate(year=TruncYear('date_of_receipt')) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
         .values('month', 'year') \
-        .annotate(total=Sum('payment')) \
+        .annotate(total=Sum('payoff')) \
         .order_by('month')
 
     res = [{'month': r['month'].strftime("%B"), 'year': r['year'].year, 'total': r['total']} for r in res]
@@ -427,9 +421,8 @@ def total_for_each_ticker(request):
     currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
         .filter(user=request.user, currency__name=currency) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
         .values('company__name') \
-        .annotate(total=Sum('payment'))
+        .annotate(total=Sum('payoff'))
 
     return JsonResponse({
         'type': 'doughnut',
@@ -477,9 +470,8 @@ def total_for_each_account(request):
     currency = request.GET.get('currency', 'USD')
     res = Dividend.objects \
         .filter(user=request.user, currency__name=currency, ) \
-        .annotate(payment=F('amount_of_shares') * F('quantity_per_share')) \
         .values('account__name') \
-        .annotate(total=Sum('payment'))
+        .annotate(total=Sum('payoff'))
 
     return JsonResponse({
         'type': 'polarArea',

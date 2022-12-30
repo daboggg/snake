@@ -137,8 +137,8 @@
                     <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
                     <div class="card-img-overlay text-center">
                         <h2 class="card-title mt-4 text-secondary">USD</h2>
-                        <h5>минимальная выплата у {{ minimum_payout_ticker_usd.company__name }} : {{ minimum_payout_ticker_usd.payment | floatformat:2  }}</h5>
-                        <h5>максимальная выплата у {{ maximum_payout_ticker_usd.company__name }} : {{ maximum_payout_ticker_usd.payment | floatformat:2  }}</h5>
+                        <h5>минимальная выплата у {{ minimum_payout_ticker_usd.company__name }} : {{ minimum_payout_ticker_usd.payoff | floatformat:2  }}</h5>
+                        <h5>максимальная выплата у {{ maximum_payout_ticker_usd.company__name }} : {{ maximum_payout_ticker_usd.payoff | floatformat:2  }}</h5>
                         <h5>число выплат дивидендов: {{ USD_p.number_payments }}</h5>
                     </div>
                 </div>
@@ -150,8 +150,8 @@
                     <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
                     <div class="card-img-overlay text-center">
                         <h2 class="card-title mt-4 text-secondary">RUB</h2>
-                        <h5>минимальная выплата у {{ minimum_payout_ticker_rub.company__name }} : {{ minimum_payout_ticker_rub.payment | floatformat:2  }}</h5>
-                        <h5>максимальная выплата у {{ maximum_payout_ticker_rub.company__name }} : {{ maximum_payout_ticker_rub.payment | floatformat:2  }}</h5>
+                        <h5>минимальная выплата у {{ minimum_payout_ticker_rub.company__name }} : {{ minimum_payout_ticker_rub.payoff | floatformat:2  }}</h5>
+                        <h5>максимальная выплата у {{ maximum_payout_ticker_rub.company__name }} : {{ maximum_payout_ticker_rub.payoff | floatformat:2  }}</h5>
                         <h5>число выплат дивидендов: {{ RUB_p.number_payments }}</h5>
                     </div>
                 </div>
