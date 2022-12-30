@@ -72,6 +72,7 @@ class Dividend(models.Model):
     date_of_receipt = models.DateField(verbose_name='Дата получения выплаты')
     amount_of_shares = models.SmallIntegerField(verbose_name='Количество акций')
     quantity_per_share = models.FloatField(verbose_name='Выплата на акцию')
+    payoff = models.FloatField(null=True, blank=True, verbose_name='Выплата')
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT, verbose_name='Валюта')
     account = models.ForeignKey(Account, on_delete=models.PROTECT, verbose_name='Счет')
 
