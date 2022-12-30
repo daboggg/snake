@@ -66,6 +66,9 @@ class Company(models.Model):
         ordering = ['name']
 
 
+class TestProba(models.Model):
+    dfsw = models.CharField(max_length=100)
+
 class Dividend(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Пользователь')
     company = models.ForeignKey(Company, on_delete=models.PROTECT, verbose_name='Компания')
