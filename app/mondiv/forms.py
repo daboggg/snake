@@ -8,12 +8,13 @@ from mondiv.models import Dividend, Company
 class AddDividendForm(forms.ModelForm):
     class Meta:
         model=Dividend
-        fields = ('company','date_of_receipt','amount_of_shares','quantity_per_share','currency','account')
+        fields = ('company','date_of_receipt','amount_of_shares','quantity_per_share', 'payoff', 'currency','account')
         widgets = {
             'company': forms.Select(attrs={'class': 'form-select'}),
             'date_of_receipt': DatePickerInput(format='%dd:%mm:%YYYY', attrs={'class': 'form-control'}),
             'amount_of_shares': forms.NumberInput(attrs={'class': 'form-control'}),
             'quantity_per_share': forms.NumberInput(attrs={'class': 'form-control'}),
+            'payoff': forms.NumberInput(attrs={'class': 'form-control'}),
             'currency': forms.Select(attrs={'class': 'form-select'}),
             'account': forms.Select(attrs={'class': 'form-select'}),
         }
