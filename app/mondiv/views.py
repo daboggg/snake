@@ -238,49 +238,15 @@ class RegisterDoneView(TemplateView):
 
 ###########  Charts json ######################################
 def proba(request):
+    currency = request.GET.get('currency', 'RUB')
     res = Dividend.objects \
-        .filter(user=request.user)
+        .filter(user=request.user, currency__name=currency) \
+        .annotate(year=TruncYear('date_of_receipt')) \
+        .values('year') \
+        .annotate(total=Sum('payoff')) \
+        .order_by('year')
 
-    total = res.values('currency__name') \
-            .annotate(total=Sum('payoff'))
-    ctx = {}
-    if total.count() == 0:
-        ctx['RUB'] = 0
-        ctx['USD'] = 0
-    else:
-        for item in total:
-            ctx[item['currency__name']] = item['total']
-
-    # минимальная и максимальная выплата в рублях по тикеру
-    payout_ticker_rub = res.filter(currency__name='RUB')\
-        .values('company__name', 'payoff')\
-        .order_by('payoff')
-    minimum_payout_ticker_rub = payout_ticker_rub.first()
-    maximum_payout_ticker_rub = payout_ticker_rub.last()
-
-    # минимальная и максимальная выплата в долларах по тикеру
-    payout_ticker_usd = res.filter(currency__name='USD') \
-        .values('company__name', 'payoff') \
-        .order_by('payoff')
-    minimum_payout_ticker_usd = payout_ticker_usd.first()
-    maximum_payout_ticker_usd = payout_ticker_usd.last()
-
-    # количество выплат
-    number_payments = res.values('currency__name')\
-                            .annotate(number_payments=Count('id'))
-
-
-
-
-
-    ctx['minimum_payout_ticker_rub'] = minimum_payout_ticker_rub
-    ctx['maximum_payout_ticker_rub'] = maximum_payout_ticker_rub
-    ctx['minimum_payout_ticker_usd'] = minimum_payout_ticker_usd
-    ctx['maximum_payout_ticker_usd'] = maximum_payout_ticker_usd
-    for n in number_payments:
-        ctx[n['currency__name']+'_p'] = n
-
-    return render(request, 'mondiv/main/proba.html', {'res': ctx})
+    return render(request, 'mondiv/main/proba.html', {'res': res})
 
 
 @login_required()
@@ -564,6 +530,58 @@ def dividend_history(request):
                     },
                     'display': 'true',
                     'text': f'Дивиденды, последние {limit} выплат'
+                },
+            }
+        }
+    })
+
+@login_required()
+def total_for_each_year(request):
+    currency = request.GET.get('currency', 'USD')
+    res = Dividend.objects \
+        .filter(user=request.user, currency__name=currency) \
+        .annotate(year=TruncYear('date_of_receipt')) \
+        .values('year') \
+        .annotate(total=Sum('payoff')) \
+        .order_by('year')
+
+    labels = [r['year'].year for r in res]
+    data = [r['total'] for r in res]
+
+    return JsonResponse({
+        'type': 'bar',
+        'data': {
+            'labels': labels,
+            'datasets': [
+                {
+                    'data': data,
+                    'label': 'Дивиденды в ' + currency,
+                },
+            ]
+        },
+        'options': {
+            'plugins': {
+                'legend': {
+                    'display': 0,
+                    'labels': {
+                        'font': {
+                            'size': 18
+                        }
+                    },
+                },
+                'tooltip': {
+                    'titleFont': {
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
+                },
+                'title': {
+                    'font': {
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Дивиденды в {currency}'
                 },
             }
         }

@@ -16,6 +16,7 @@ urlpatterns = [
     path('proba/', proba, name='proba'),
     path('last_year/', last_year, name='last_year'),
     path('last_n_years/', last_n_years, name='last_n_years'),
+    path('total_for_each_year/', total_for_each_year, name='total_for_each_year'),
     path('total_for_each_ticker/', total_for_each_ticker, name='total_for_each_ticker'),
     path('total_for_each_account/', total_for_each_account, name='total_for_each_account'),
     path('dividend_history/', dividend_history, name='dividend_history'),
