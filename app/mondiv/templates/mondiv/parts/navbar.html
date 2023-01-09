@@ -22,6 +22,14 @@
                             <a class="nav-link {% if url_name == 'dividends_received' %}active{% endif %}"
                                href="{% url 'mondiv:dividends_received' %}">Полученные дивиденды</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if url_name == 'add_report' %}active{% endif %}"
+                               href="{% url 'mondiv:add_report' %}">Добавить отчет</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if url_name == 'report_list' %}active{% endif %}"
+                               href="{% url 'mondiv:report_list' %}">Отчеты</a>
+                        </li>
 {#                        <li class="nav-item">#}
 {#                            <a class="nav-link" href="{% url 'mondiv:proba' %}">Проба</a>#}
 {#                        </li>#}

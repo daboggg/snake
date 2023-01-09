@@ -79,3 +79,15 @@ class Dividend(models.Model):
     class Meta:
         verbose_name = 'Дивиденд'
         verbose_name_plural = 'Дивиденды'
+
+
+class Report(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Пользователь')
+    account = models.ForeignKey(Account, on_delete=models.PROTECT, verbose_name='Счет')
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT, verbose_name='Валюта')
+    report_date = models.DateField(verbose_name='Дата отчета')
+    amount = models.FloatField(verbose_name='Сумма')
+
+    class Meta:
+        verbose_name = 'Отчет'
+        verbose_name_plural = 'Отчеты'

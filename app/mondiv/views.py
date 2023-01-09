@@ -20,12 +20,78 @@ from django.views.generic import UpdateView, CreateView, TemplateView, ListView,
 import requests
 from polygon import RESTClient
 
-from mondiv.forms import SearchCompanyForm, ChangeUserInfoForm, AddDividendForm, DividendPeriodForm
-from mondiv.models import Company, Dividend
+from mondiv.forms import SearchCompanyForm, ChangeUserInfoForm, AddDividendForm, DividendPeriodForm, AddReportForm
+from mondiv.models import Company, Dividend, Report
 from mondiv.utils import client, get_month_list
 
 from datetime import datetime, timedelta, date
 
+
+# Отчеты ##############################################################
+
+class AddReportView(LoginRequiredMixin, CreateView):
+    form_class = AddReportForm
+    template_name = 'mondiv/main/add_report.html'
+    success_url = reverse_lazy('mondiv:report_list')
+
+    def form_valid(self, form):
+        fields = form.save(commit=False)
+        fields.user = self.request.user
+        fields.save()
+        return super().form_valid(form)
+
+
+class ReportListView(LoginRequiredMixin, ListView):
+    model = Report
+    context_object_name = 'reports'
+    template_name = 'mondiv/main/report_list.html'
+
+    def get_queryset(self):
+        # Возвращает по умолчанию 50 последних записей
+        limit = self.request.GET.get('limit', 50)
+        return Report.objects.filter(user=self.request.user) \
+                   .order_by('-id')[:int(limit):-1]
+
+
+class ReportdUpdateView(LoginRequiredMixin, UpdateView):
+    model = Report
+    form_class = AddReportForm
+    template_name = 'mondiv/main/report_update.html'
+    pk_url_kwarg = 'report_pk'
+    success_url = reverse_lazy('mondiv:report_list')
+
+    def get_queryset(self):
+        return Report.objects.filter(pk=self.kwargs[self.pk_url_kwarg], user=self.request.user)
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, 'Отчет  исправлен')
+        return super().form_valid(form)
+
+
+class ReportDeleteView(LoginRequiredMixin, DeleteView):
+    model = Report
+    pk_url_kwarg = 'report_pk'
+    success_url = reverse_lazy('mondiv:report_list')
+    template_name = 'mondiv/main/report_confirm_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.user == request.user:
+            self.object.delete()
+            messages.add_message(request, messages.SUCCESS, 'Отчет удален')
+            return HttpResponseRedirect(self.success_url)
+        else:
+            messages.add_message(request, messages.ERROR, 'Удаление невозможно, это не ваш отчет')
+            return HttpResponseRedirect(self.success_url)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['account'] = self.object.account
+        context['report_date'] = self.object.report_date
+        return context
+
+
+# Дивиденды #################################################################################
 
 class AddDividendView(LoginRequiredMixin, CreateView):
     form_class = AddDividendForm
@@ -86,7 +152,7 @@ class DividendsReceivedView(LoginRequiredMixin, ListView):
         if self.request.GET and self.request.GET['start'] and self.request.GET['end']:
             start = self.request.GET['start']
             end = self.request.GET['end']
-            return Dividend.objects.filter(user=self.request.user, date_of_receipt__range=[start,end])
+            return Dividend.objects.filter(user=self.request.user, date_of_receipt__range=[start, end])
 
         # Возвращает по умолчанию 50 последних записей
         limit = self.request.GET.get('limit', 50)
@@ -186,7 +252,7 @@ def profile(request):
 
     # количество выплат
     number_payments = res.values('currency__name') \
-                        .annotate(number_payments=Count('id'))
+        .annotate(number_payments=Count('id'))
 
     # контекст
     ctx['minimum_payout_ticker_rub'] = minimum_payout_ticker_rub
@@ -238,13 +304,13 @@ class RegisterDoneView(TemplateView):
 
 ###########  Charts json ######################################
 def proba(request):
-    currency = request.GET.get('currency', 'RUB')
-    res = Dividend.objects \
+    currency = request.GET.get('currency', 'USD')
+    res = Report.objects \
         .filter(user=request.user, currency__name=currency) \
-        .annotate(year=TruncYear('date_of_receipt')) \
-        .values('year') \
-        .annotate(total=Sum('payoff')) \
-        .order_by('year')
+        .values('report_date') \
+        .annotate(total=Sum('amount'))
+
+
 
     return render(request, 'mondiv/main/proba.html', {'res': res})
 
@@ -535,6 +601,7 @@ def dividend_history(request):
         }
     })
 
+
 @login_required()
 def total_for_each_year(request):
     currency = request.GET.get('currency', 'USD')
@@ -601,6 +668,128 @@ def total_for_each_year(request):
                     },
                     'display': 'true',
                     'text': f'Дивиденды в {currency}'
+                },
+            }
+        }
+    })
+
+
+@login_required()
+def all_reports(request):
+    currency = request.GET.get('currency', 'USD')
+    accounts = Report.objects \
+        .filter(user=request.user, currency__name=currency) \
+        .values_list('account__name').distinct()
+
+    res = []
+    for account in accounts:
+        res.append(
+            Report.objects \
+                .filter(user=request.user, currency__name=currency, account__name=account[0]) \
+                .values('report_date', 'amount', 'account__name') \
+                .order_by('report_date')
+        )
+
+    return JsonResponse({
+        'type': 'line',
+        'data': {
+            'datasets': [
+                {
+                    'data': {
+                        # 'January': 400
+                        f"{item['report_date'].strftime('%B')} - {item['report_date'].year}": item['amount']
+                        for item in acc
+                    },
+                    'label': acc[0]['account__name'],
+                    'pointStyle': 'circle',
+                    'pointRadius': 8,
+                    'pointHoverRadius': 10
+                }
+                for acc in res
+            ]
+        },
+        'options': {
+            'responsive': 1,
+            'plugins': {
+                'legend': {
+                    'display': 1,
+                    'position': 'top',
+                    'labels': {
+                        'font': {
+                            'size': 18
+                        }
+                    },
+                },
+                'tooltip': {
+                    'titleFont': {
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
+                },
+                'title': {
+                    'font': {
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Отчеты в {currency}'
+                },
+            }
+        }
+    })
+
+
+@login_required()
+def report_in_currency(request):
+    currency = request.GET.get('currency', 'USD')
+    res = Report.objects \
+        .filter(user=request.user, currency__name=currency) \
+        .values('report_date') \
+        .annotate(total=Sum('amount'))
+
+    return JsonResponse({
+        'type': 'line',
+        'data': {
+            'datasets': [
+                {
+                    'data': {
+                        # 'January': 400
+                        # f"{item['report_date'].strftime('%B')} - {item['report_date'].year}": item['amount']
+                        f"{r['report_date'].strftime('%B')} - {r['report_date'].year}": r['total']
+                        for r in res
+                    },
+                    'label': 'sdsdssssdef ee gr',
+                    'pointStyle': 'circle',
+                    'pointRadius': 8,
+                    'pointHoverRadius': 10
+                }
+            ]
+        },
+        'options': {
+            'responsive': 1,
+            'plugins': {
+                'legend': {
+                    'display': 0,
+                    'position': 'top',
+                    'labels': {
+                        'font': {
+                            'size': 18
+                        }
+                    },
+                },
+                'tooltip': {
+                    'titleFont': {
+                        'size': 20
+                    },
+                    'titleAlign': 'center',
+                    'boxPadding': 10
+                },
+                'title': {
+                    'font': {
+                        'size': 30
+                    },
+                    'display': 'true',
+                    'text': f'Отчет в {currency}'
                 },
             }
         }

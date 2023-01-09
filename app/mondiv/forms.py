@@ -2,7 +2,7 @@ from bootstrap_datepicker_plus.widgets import DatePickerInput
 from django import forms
 from django.contrib.auth.models import User
 
-from mondiv.models import Dividend, Company
+from mondiv.models import Dividend, Company, Report
 
 
 class AddDividendForm(forms.ModelForm):
@@ -33,3 +33,12 @@ class ChangeUserInfoForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
+
+
+class AddReportForm(forms.ModelForm):
+    class Meta:
+        model=Report
+        fields = ('account','currency', 'report_date', 'amount')
+        widgets = {
+            'report_date': DatePickerInput(format='%dd:%mm:%YYYY'),
+        }

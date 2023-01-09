@@ -18,200 +18,305 @@
 
 
     <div class="container mt-5">
-        <div class="row my-5">
-            <div class="col-6">
 
-                <canvas id="total_for_each_year_usd" width="500" height="400"></canvas>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
+                   aria-selected="true"><h3>Дивиденды</h3></a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
+                   aria-controls="profile" aria-selected="false"><h3>Отчеты</h3></a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
-                <script type="text/javascript">
-                    $.get({% url 'mondiv:total_for_each_year' %}, function (data) {
-                        var ctx = $("#total_for_each_year_usd").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
+                <div class="row my-5">
+                    <div class="col-6">
 
+                        <canvas id="total_for_each_year_usd" width="500" height="400"></canvas>
 
-            </div>
-            <div class="col-6">
-
-                <canvas id="total_for_each_year_rub" width="500" height="400"></canvas>
-
-                <script type="text/javascript">
-                    $.get(({% url 'mondiv:total_for_each_year' %} +'?currency=RUB'), function (data) {
-                        var ctx = $("#total_for_each_year_rub").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
-
-
-            </div>
-        </div>
-        <div class="row my-3">
-            <div class="col-6">
-
-                <canvas id="myChart1" width="500" height="400"></canvas>
-
-                <script type="text/javascript">
-                    $.get({% url 'mondiv:last_year' %}, function (data) {
-                        var ctx = $("#myChart1").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:total_for_each_year' %}, function (data) {
+                                var ctx = $("#total_for_each_year_usd").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
 
 
-            </div>
-            <div class="col-6">
+                    </div>
+                    <div class="col-6">
 
-                <canvas id="myChart2" width="500" height="400"></canvas>
+                        <canvas id="total_for_each_year_rub" width="500" height="400"></canvas>
 
-                <script type="text/javascript">
-                    $.get({% url 'mondiv:last_year' %}+'?currency=RUB', function (data) {
-                        var ctx = $("#myChart2").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
-
-
-            </div>
-        </div>
-        <div class="row my-3">
-            <div class="col-6">
-
-                <canvas id="myChart3" width="500" height="400"></canvas>
-
-                <script type="text/javascript">
-                    $.get({% url 'mondiv:last_n_years' %}, function (data) {
-                        var ctx = $("#myChart3").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
+                        <script type="text/javascript">
+                            $.get(({% url 'mondiv:total_for_each_year' %} +'?currency=RUB'), function (data) {
+                                var ctx = $("#total_for_each_year_rub").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
 
 
-            </div>
-            <div class="col-6">
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-6">
 
-                <canvas id="myChart4" width="500" height="400"></canvas>
+                        <canvas id="myChart1" width="500" height="400"></canvas>
 
-                <script type="text/javascript">
-                    $.get(({% url 'mondiv:last_n_years' %} +'?currency=RUB'), function (data) {
-                        var ctx = $("#myChart4").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
-
-
-            </div>
-        </div>
-        <div class="row my-3">
-            <div class="col-6">
-
-                <canvas id="myChart5" width="500" height="400"></canvas>
-
-                <script type="text/javascript">
-                    $.get({% url 'mondiv:total_for_each_ticker' %}, function (data) {
-                        var ctx = $("#myChart5").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:last_year' %}, function (data) {
+                                var ctx = $("#myChart1").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
 
 
-            </div>
-            <div class="col-6">
+                    </div>
+                    <div class="col-6">
 
-                <canvas id="myChart6" width="500" height="400"></canvas>
+                        <canvas id="myChart2" width="500" height="400"></canvas>
 
-                <script type="text/javascript">
-                    $.get(({% url 'mondiv:total_for_each_ticker' %} +'?currency=RUB'), function (data) {
-                        var ctx = $("#myChart6").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
-
-
-            </div>
-        </div>
-        <div class="row my-3">
-            <div class="col-6">
-
-                <canvas id="myChart7" width="500" height="400"></canvas>
-
-                <script type="text/javascript">
-                    $.get({% url 'mondiv:total_for_each_account' %}, function (data) {
-                        var ctx = $("#myChart7").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:last_year' %}+'?currency=RUB', function (data) {
+                                var ctx = $("#myChart2").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
 
 
-            </div>
-            <div class="col-6">
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-6">
 
-                <canvas id="myChart8" width="500" height="400"></canvas>
+                        <canvas id="myChart3" width="500" height="400"></canvas>
 
-                <script type="text/javascript">
-                    $.get(({% url 'mondiv:total_for_each_account' %} +'?currency=RUB'), function (data) {
-                        var ctx = $("#myChart8").get(0).getContext("2d");
-                        new Chart(ctx, data);
-                    });
-                </script>
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:last_n_years' %}, function (data) {
+                                var ctx = $("#myChart3").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
 
 
-            </div>
-        </div>
-        <div class="row my-5">
-            <div class="col-6 px-5">
+                    </div>
+                    <div class="col-6">
 
-                <div class="card text-bg-dark">
-                    <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
-                    <div class="card-img-overlay text-center">
-                        <h2 class="card-title mt-4 text-secondary">USD</h2>
-                        <h5>минимальная выплата у {{ minimum_payout_ticker_usd.company__name }} : {{ minimum_payout_ticker_usd.payoff | floatformat:2  }}</h5>
-                        <h5>максимальная выплата у {{ maximum_payout_ticker_usd.company__name }} : {{ maximum_payout_ticker_usd.payoff | floatformat:2  }}</h5>
-                        <h5>число выплат дивидендов: {{ USD_p.number_payments }}</h5>
+                        <canvas id="myChart4" width="500" height="400"></canvas>
+
+                        <script type="text/javascript">
+                            $.get(({% url 'mondiv:last_n_years' %} +'?currency=RUB'), function (data) {
+                                var ctx = $("#myChart4").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-6">
+
+                        <canvas id="myChart5" width="500" height="400"></canvas>
+
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:total_for_each_ticker' %}, function (data) {
+                                var ctx = $("#myChart5").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                    <div class="col-6">
+
+                        <canvas id="myChart6" width="500" height="400"></canvas>
+
+                        <script type="text/javascript">
+                            $.get(({% url 'mondiv:total_for_each_ticker' %} +'?currency=RUB'), function (data) {
+                                var ctx = $("#myChart6").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-6">
+
+                        <canvas id="myChart7" width="500" height="400"></canvas>
+
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:total_for_each_account' %}, function (data) {
+                                var ctx = $("#myChart7").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                    <div class="col-6">
+
+                        <canvas id="myChart8" width="500" height="400"></canvas>
+
+                        <script type="text/javascript">
+                            $.get(({% url 'mondiv:total_for_each_account' %} +'?currency=RUB'), function (data) {
+                                var ctx = $("#myChart8").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                </div>
+                <div class="row my-5">
+                    <div class="col-6 px-5">
+
+                        <div class="card text-bg-dark">
+                            <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg"
+                                 class="card-img" alt="...">
+                            <div class="card-img-overlay text-center">
+                                <h2 class="card-title mt-4 text-secondary">USD</h2>
+                                <h5>минимальная выплата у {{ minimum_payout_ticker_usd.company__name }}
+                                    : {{ minimum_payout_ticker_usd.payoff | floatformat:2 }}</h5>
+                                <h5>максимальная выплата у {{ maximum_payout_ticker_usd.company__name }}
+                                    : {{ maximum_payout_ticker_usd.payoff | floatformat:2 }}</h5>
+                                <h5>число выплат дивидендов: {{ USD_p.number_payments }}</h5>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-6 px-5">
+
+                        <div class="card text-bg-dark">
+                            <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg"
+                                 class="card-img" alt="...">
+                            <div class="card-img-overlay text-center">
+                                <h2 class="card-title mt-4 text-secondary">RUB</h2>
+                                <h5>минимальная выплата у {{ minimum_payout_ticker_rub.company__name }}
+                                    : {{ minimum_payout_ticker_rub.payoff | floatformat:2 }}</h5>
+                                <h5>максимальная выплата у {{ maximum_payout_ticker_rub.company__name }}
+                                    : {{ maximum_payout_ticker_rub.payoff | floatformat:2 }}</h5>
+                                <h5>число выплат дивидендов: {{ RUB_p.number_payments }}</h5>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row my-5">
+                    <div class="col-6 px-5">
+
+                        <div class="card text-bg-dark">
+                            <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg"
+                                 class="card-img" alt="...">
+                            <div class="card-img-overlay text-center">
+                                <h1 class="card-title mt-5 text-secondary">Всего в USD</h1>
+                                <div class="display-1 fw-bold text-secondary">{{ USD | floatformat:2 }}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-6 px-5">
+
+                        <div class="card text-bg-dark">
+                            <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg"
+                                 class="card-img" alt="...">
+                            <div class="card-img-overlay text-center">
+                                <h1 class="card-title mt-5 text-secondary">Всего в RUB</h1>
+                                <div class="display-1 fw-bold text-secondary">{{ RUB | floatformat:2 }}</div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
             </div>
-            <div class="col-6 px-5">
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
 
-                <div class="card text-bg-dark">
-                    <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
-                    <div class="card-img-overlay text-center">
-                        <h2 class="card-title mt-4 text-secondary">RUB</h2>
-                        <h5>минимальная выплата у {{ minimum_payout_ticker_rub.company__name }} : {{ minimum_payout_ticker_rub.payoff | floatformat:2  }}</h5>
-                        <h5>максимальная выплата у {{ maximum_payout_ticker_rub.company__name }} : {{ maximum_payout_ticker_rub.payoff | floatformat:2  }}</h5>
-                        <h5>число выплат дивидендов: {{ RUB_p.number_payments }}</h5>
+                <div class="row my-5">
+                    <div class="col">
+
+                        <canvas id="all_reports_usd" width="500" height="230"></canvas>
+
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:all_reports' %}, function (data) {
+                                var ctx = $("#all_reports_usd").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                </div>
+                <div class="row my-5">
+                    <div class="col">
+
+                        <canvas id="all_reports_rub" width="500" height="230"></canvas>
+
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:all_reports' %} +'?currency=RUB', function (data) {
+                                var ctx = $("#all_reports_rub").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                </div>
+                <div class="row my-5">
+                    <div class="col">
+
+                        <canvas id="report_in_currency_usd" width="500" height="230"></canvas>
+
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:report_in_currency' %}, function (data) {
+                                var ctx = $("#report_in_currency_usd").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
+                    </div>
+                </div>
+                <div class="row my-5">
+                    <div class="col">
+
+                        <canvas id="report_in_currency_rub" width="500" height="230"></canvas>
+
+                        <script type="text/javascript">
+                            $.get({% url 'mondiv:report_in_currency' %} +'?currency=RUB', function (data) {
+                                var ctx = $("#report_in_currency_rub").get(0).getContext("2d");
+                                new Chart(ctx, data);
+                            });
+                        </script>
+
+
                     </div>
                 </div>
 
             </div>
         </div>
-        <div class="row my-5">
-            <div class="col-6 px-5">
 
-                <div class="card text-bg-dark">
-                    <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
-                    <div class="card-img-overlay text-center">
-                        <h1 class="card-title mt-5 text-secondary">Всего в USD</h1>
-                        <div class="display-1 fw-bold text-secondary">{{ USD | floatformat:2 }}</div>
-                    </div>
-                </div>
 
-            </div>
-            <div class="col-6 px-5">
 
-                <div class="card text-bg-dark">
-                    <img src="https://catherineasquithgallery.com/uploads/posts/2021-02/1614378690_22-p-svetlii-fon-dlya-oboev-na-telefon-23.jpg" class="card-img" alt="...">
-                    <div class="card-img-overlay text-center">
-                        <h1 class="card-title mt-5 text-secondary">Всего в RUB</h1>
-                        <div class="display-1 fw-bold text-secondary">{{ RUB | floatformat:2 }}</div>
-                    </div>
-                </div>
 
-            </div>
-        </div>
+
     </div>
 
+    <script type="text/javascript">
+        var triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+
+            triggerEl.addEventListener('click', function (e) {
+                e.preventDefault()
+                tabTrigger.show()
+            })
+        })
+    </script>
 
 
 {% endblock %}

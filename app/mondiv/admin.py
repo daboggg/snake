@@ -1,7 +1,16 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from mondiv.models import Company, Account, Currency, Dividend
+from mondiv.models import Company, Account, Currency, Dividend, Report
+
+
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ('id',
+        'account','currency',
+        'report_date'
+        ,'amount')
+    list_filter = ('report_date',)
+
 
 class DividendAdmin(admin.ModelAdmin):
     list_display = ('id',
@@ -30,3 +39,4 @@ admin.site.register(Company, CompanyAdmin)
 admin.site.register(Account)
 admin.site.register(Currency)
 admin.site.register(Dividend, DividendAdmin)
+admin.site.register(Report, ReportAdmin)

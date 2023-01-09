@@ -1,0 +1,54 @@
+{% extends 'mondiv/layout/basic.html' %}
+{% load bootstrap5 %}
+{% load bootstrap_icons %}
+{% load my_tags_and_filters %}
+{#{% bootstrap_css %}#}
+{#{% bootstrap_javascript %}#}
+{% block title %}
+    Отчеты
+{% endblock %}
+
+{% block content %}
+    {% bs_icon 'pencil' size='1.3em' color='black' as pencil %}
+    {% bs_icon 'x-lg' size='1.3em' color='red' as xlg %}
+    <div class="container">
+
+        <div class="row text-center mt-5"><h1>
+            Последние 50 отчетов
+        </h1></div>
+
+        <div class="row mt-5">
+            <div class="col text-center">
+                <table class="table align-middle">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Cчет</th>
+                        <th scope="col">Валюта</th>
+                        <th scope="col">Дата отчета</th>
+                        <th scope="col">Сумма</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for report in reports %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ report.account.name }}</td>
+                            <td>{{ report.currency.name }}</td>
+                            <td>{{ report.report_date }}</td>
+                            <td>{{ report.amount }}</td>
+                            <td>
+                                <a href="{% url 'mondiv:report_update' report.pk %}">{{ pencil }}</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'mondiv:report_delete' report.pk %}">{{ xlg }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
