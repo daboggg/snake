@@ -216,7 +216,8 @@ class ShowCompany(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dividends'] = Dividend.objects.filter(company=self.get_object(), user=self.request.user)
+        context['dividends'] = Dividend.objects.filter(company=self.get_object(), user=self.request.user)\
+            .order_by('date_of_receipt')
         return context
 
 
