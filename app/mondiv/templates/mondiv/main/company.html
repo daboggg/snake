@@ -38,5 +38,31 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-5">
+            <div class="col-8 offset-2">
+                <table class="table align-middle">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Дата выплаты</th>
+                        <th scope="col">Сумма</th>
+                        <th scope="col">Валюта</th>
+                        <th scope="col">Счет</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for dividend in dividends %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ dividend.date_of_receipt }}</td>
+                            <td>{{ dividend.payoff }}</td>
+                            <td>{{ dividend.currency }}</td>
+                            <td>{{ dividend.account }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 {% endblock %}

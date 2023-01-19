@@ -11,11 +11,11 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import F, Count, Sum, DateField, Min, Subquery
 from django.db.models.functions import TruncMonth, TruncYear
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils.http import urlencode
-from django.views.generic import UpdateView, CreateView, TemplateView, ListView, DeleteView
+from django.views.generic import UpdateView, CreateView, TemplateView, ListView, DeleteView, DetailView
 
 import requests
 from polygon import RESTClient
@@ -208,12 +208,16 @@ def index(request):
 
 
 # подробно про компанию (дивиденты и инфо)
-def company(request, company_pk):
-    try:
-        company = Company.objects.get(pk=company_pk)
-    except Exception as e:
-        messages.add_message(request, messages.ERROR, e)
-    return render(request, 'mondiv/main/company.html', {'company': company})
+class ShowCompany(LoginRequiredMixin, DetailView):
+    model = Company
+    template_name = 'mondiv/main/company.html'
+    pk_url_kwarg = 'company_pk'
+    context_object_name = 'company'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dividends'] = Dividend.objects.filter(company=self.get_object(), user=self.request.user)
+        return context
 
 
 ##########  AUTH  #############################################################
