@@ -216,8 +216,10 @@ class ShowCompany(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dividends'] = Dividend.objects.filter(company=self.get_object(), user=self.request.user)\
+        dividends = Dividend.objects.filter(company=self.get_object(), user=self.request.user)\
             .order_by('date_of_receipt')
+        context['dividends'] = dividends
+        context['total'] = dividends.aggregate(total=Sum('payoff'))['total']
         return context
 
 
