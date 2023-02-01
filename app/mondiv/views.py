@@ -317,8 +317,6 @@ def proba(request):
         .values('report_date') \
         .annotate(total=Sum('amount'))
 
-
-
     return render(request, 'mondiv/main/proba.html', {'res': res})
 
 
@@ -765,10 +763,11 @@ def report_in_currency(request):
                         f"{r['report_date'].strftime('%B')} - {r['report_date'].year}": r['total']
                         for r in res
                     },
-                    'label': 'sdsdssssdef ee gr',
+                    'label': currency,
                     'pointStyle': 'circle',
                     'pointRadius': 8,
                     'pointHoverRadius': 10
+
                 }
             ]
         },
